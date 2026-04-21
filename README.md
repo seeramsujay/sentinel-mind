@@ -6,7 +6,7 @@ To dramatically decrease the emergency response time window from hours to second
 ## Project Structure
 - `backend/`: Python-based logic for triage ingestion, resource management, and meta-orchestration.
 - `frontend/`: React-based Enterprise Command Center dashboard.
-- `scripts/`: Operational scripts, daemons (Watcher, WhatsApp Actuator), and stress-testing tools.
+- `scripts/`: Operational scripts, daemons (Watcher, Discord Actuator), and stress-testing tools.
 - `Archives/`: Documentation, roadmaps, and technical specifications.
 
 ## Technology Stack
@@ -15,7 +15,7 @@ To dramatically decrease the emergency response time window from hours to second
 - **Frontend**: React, Tailwind CSS, Google Maps React API, Firebase Hosting.
 - **AI/ML**: Gemini 1.5 Flash (Triage), Gemini 1.5 Pro (RAG & Risk Assessment), Gemini 1.5 Pro Vision (Image Analysis).
 - **Logistics**: Google Maps Routes API.
-- **Actuation**: Twilio WhatsApp API.
+- **Actuation**: Discord Webhook API.
 
 ## Team Roles
 - **Role 1**: System Designer & Meta-Orchestrator (The Brain).

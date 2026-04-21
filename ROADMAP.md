@@ -23,7 +23,7 @@ Before anyone codes, the team must finalize the JSON Schema and state pipeline. 
 ### Role 2: Triage Ingestion Lead (The Filter & Actuator)
 * **April 22 (Day 1):** Write the feedparser script to pull live RSS alerts. Connect it to Gemini 1.5 Flash using `response_schema` to force perfect JSON outputs.
 * **April 23 (Day 2):** Hook your script to Firestore. Push the JSON into `/emergencies` as `status: "triaged"`.
-* **April 24 (Day 3):** **[UPGRADE] Build the Twilio WhatsApp Actuator.** Write the daemon that listens to Firestore. When an emergency flips to `status: "dispatched"`, send an automated WhatsApp message to a real phone to prove the AI has real-world agency.
+* **April 24 (Day 3):** **[UPGRADE] Build the Discord Actuator.** Write the daemon that listens to Firestore. When an emergency flips to `status: "dispatched"`, send an automated Discord message to prove the AI has real-world agency.
 * **April 25 (Day 4):** Code Freeze. Build a "Mock Data Spammer" script that injects 50 fake emergencies into Firestore to stress-test the system. Harden against rate limits. 
 * **April 26 (Day 5):** **The Splice (Integration).** Turn on the firehose. Run your mock spammer so Roles 1, 3, and 4 have data to process.
 * **April 27 (Day 6):** Fix any JSON parsing errors or database write limits found during stress testing.
@@ -53,6 +53,6 @@ Before anyone codes, the team must finalize the JSON Schema and state pipeline. 
 ### All Hands: April 28 (Submission Evening)
 Dev work is strictly forbidden today.
 1. **The Golden Path:** Run a perfectly executed crisis simulation on the live app.
-2. **Record the Demo:** Do not edit fancy transitions. Show the mobile UI, show the Twilio WhatsApp ping hitting a real phone, click the "HITL Override" button, and highlight the SDG live trackers. Let the complex async code speak for itself.
+2. **Record the Demo:** Do not edit fancy transitions. Show the mobile UI, show the Discord ping hitting the alert channel, click the "HITL Override" button, and highlight the SDG live trackers. Let the complex async code speak for itself.
 3. **Clean the Repo:** Clean up the GitHub README, ensure no `.env` files or API keys are public, and attach your architecture diagram.
 4. **Submit:** Hit submit on the portal.

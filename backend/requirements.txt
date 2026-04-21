@@ -17,3 +17,7 @@ python-dotenv
 # Utils
 pydantic
 asyncio
+
+# Actuation
+discord.py
+requests
