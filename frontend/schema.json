@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SentinelMind Emergency Object",
+  "description": "Unified data contract for disaster response agents.",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "source": { "type": "string" },
+    "location": {
+      "type": "object",
+      "properties": {
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "address": { "type": "string" },
+        "region": { "type": "string" }
+      },
+      "required": ["lat", "lng"]
+    },
+    "hazard_type": { "type": "string" },
+    "urgency": {
+      "type": "string",
+      "enum": ["P1", "P2", "P3"]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "received",
+        "triaged",
+        "awaiting_dispatch",
+        "dispatched",
+        "conflict",
+        "recovery",
+        "awaiting_human_approval"
+      ]
+    },
+    "resource_assignment": {
+      "type": "object",
+      "properties": {
+        "unit_id": { "type": "string" },
+        "resource_type": { "type": "string" },
+        "polyline_route": { "type": "string" },
+        "eta": { "type": "string" },
+        "carbon_saved": { "type": "number", "description": "CO2 kg Prevented" }
+      }
+    },
+    "intelligence": {
+      "type": "object",
+      "properties": {
+        "risk_assessment": { "type": "string" },
+        "sitrep": { "type": "string" },
+        "language_preference": { "type": "string", "default": "en" },
+        "fairness_audit": { "type": "string" }
+      }
+    }
+  },
+  "required": ["location", "hazard_type", "urgency", "status"]
+}
