@@ -1,0 +1,19 @@
+# SentinelMind Backend Requirements
+
+# GCP & AI
+google-cloud-aiplatform
+google-cloud-secret-manager
+vertexai
+
+# Database
+firebase-admin
+
+# APIs & Logic
+feedparser
+requests
+googlemaps
+python-dotenv
+
+# Utils
+pydantic
+asyncio
