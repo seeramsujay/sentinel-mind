@@ -36,3 +36,4 @@ secrets.py
 .DS_Store
 Thumbs.db
 Archives/
+.agent/
