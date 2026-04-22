@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #EEF2F7;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+        }
+    </style>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"inverse-on-surface": "#f0f0fb", surface: "#faf8ff", "on-secondary-fixed": "#00184a", "primary-container": "#2563eb", "surface-tint": "#0053db", "on-secondary-fixed-variant": "#2b4384", "surface-variant": "#e1e2ed", "secondary-fixed-dim": "#b3c5ff", "surface-container-highest": "#e1e2ed", "on-primary": "#ffffff", "tertiary-fixed-dim": "#ffb596", "surface-container": "#ededf9", "on-error-container": "#93000a", "surface-dim": "#d9d9e5", "secondary-fixed": "#dbe1ff", "on-tertiary-fixed": "#360f00", "on-tertiary-container": "#ffede6", "on-tertiary": "#ffffff", "on-surface": "#191b23", "on-surface-variant": "#434655", "tertiary-fixed": "#ffdbcd", tertiary: "#943700", "outline-variant": "#c3c6d7", "tertiary-container": "#bc4800", secondary: "#445c9d", "on-secondary-container": "#2d4686", "error-container": "#ffdad6", "inverse-primary": "#b4c5ff", "surface-container-low": "#f3f3fe", "on-background": "#191b23", "on-primary-fixed": "#00174b", "inverse-surface": "#2e3039", "secondary-container": "#9fb7ff", primary: "#004ac6", "surface-bright": "#faf8ff", "on-primary-fixed-variant": "#003ea8", "surface-container-high": "#e7e7f3", "primary-fixed": "#dbe1ff", "on-secondary": "#ffffff", "primary-fixed-dim": "#b4c5ff", error: "#ba1a1a", outline: "#737686", "on-error": "#ffffff", "surface-container-lowest": "#ffffff", "on-primary-container": "#eeefff", background: "#faf8ff", "on-tertiary-fixed-variant": "#7d2d00"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {sidebar_left: "280px", unit: "4px", margin: "24px", gutter: "16px", sidebar_right: "320px"}, fontFamily: {"ui-header": ["Inter"], "body-prose": ["Inter"], "ui-label-bold": ["Inter"], "data-mono": ["Geist Mono"], "body-medium": ["Inter"], "display-brand": ["Inter"], "data-terminal": ["Geist Mono"]}, fontSize: {"ui-header": ["18px", {lineHeight: "140%", fontWeight: "700"}], "body-prose": ["15px", {lineHeight: "160%", fontWeight: "400"}], "ui-label-bold": ["12px", {lineHeight: "100%", letterSpacing: "0.05em", fontWeight: "600"}], "data-mono": ["13px", {lineHeight: "150%", fontWeight: "400"}], "body-medium": ["15px", {lineHeight: "160%", fontWeight: "500"}], "display-brand": ["24px", {lineHeight: "120%", letterSpacing: "-0.02em", fontWeight: "800"}], "data-terminal": ["12px", {lineHeight: "140%", fontWeight: "300"}]}}}};</script>
+</head>
+<body class="bg-[#EEF2F7] font-body-prose text-on-surface">
+<!-- TopNavBar Component -->
+<nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none flex justify-between items-center px-6 w-full sticky top-0 z-50 h-[56px] font-sans antialiased tracking-tight Sora font-semibold">
+<div class="flex items-center gap-8 h-full">
+<span class="text-lg font-bold tracking-tighter text-slate-900 dark:text-white uppercase">SentinelMind</span>
+<div class="hidden md:flex h-full items-center">
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 h-full flex items-center px-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-100 cursor-pointer active:scale-[0.98] transition-transform" href="#">Dashboard</a>
+<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 h-full flex items-center px-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-100 cursor-pointer active:scale-[0.98] transition-transform" href="#">Asset Tree</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 h-full flex items-center px-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-100 cursor-pointer active:scale-[0.98] transition-transform" href="#">Field Upload</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-slate-500 hover:text-slate-900 transition-colors">notifications</button>
+<button class="material-symbols-outlined text-slate-500 hover:text-slate-900 transition-colors">settings</button>
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden border border-slate-300">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close-up professional portrait of a security technician in a well-lit office with clean lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDToDBFHhbQiFWM3yz5UuwTqSm0SotOb_RCDdfMvs4rsju6cgAsPW78x4ydBWfGW-FpAIC034ooyO_s8TZmvRJJ2TWmFqBOFv85PWIfsOhkNM8dFMcTL17-JyowLJTfWLg8GixEJirquv3dGcOeD2ue8ctjfOiEOH9I5uoL7SzbIiK-nDC0yfsOxBC_t4rloZ-Eo7jWDzN74qBgPWZvYlXNIRZ7lomeL8htLbkl7QYs0GSz2CaX7c4eBmtIAsvBH7bvUA6vEreNprM"/>
+</div>
+</div>
+</nav>
+<!-- Main Workspace -->
+<main class="flex h-[calc(100vh-56px)] overflow-hidden">
+<!-- Center Column: Asset Tree Explorer -->
+<div class="flex-1 flex flex-col bg-white border-r border-outline-variant">
+<!-- Search & Filter Header -->
+<div class="p-6 border-b border-outline-variant bg-surface-container-low flex items-center gap-4">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 border border-outline-variant rounded bg-white font-body-medium text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Search Asset ID, Type, or Fleet..." type="text"/>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-white border border-outline-variant rounded font-ui-label-bold text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                    FILTERS
+                </button>
+</div>
+<!-- Tree Content -->
+<div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+<div class="space-y-1">
+<!-- Root: Orbital Network -->
+<div class="flex items-center gap-2 py-2 group cursor-pointer hover:bg-surface-container-low px-2 rounded">
+<span class="material-symbols-outlined text-outline">keyboard_arrow_down</span>
+<span class="material-symbols-outlined text-primary">public</span>
+<span class="font-ui-header text-[15px]">Orbital Fleet [O-NET]</span>
+<span class="ml-auto font-data-mono text-[11px] text-outline">4/4 ACTIVE</span>
+</div>
+<!-- Children: Satellites -->
+<div class="ml-8 space-y-1 border-l border-outline-variant">
+<!-- Satellite Item -->
+<div class="flex items-center gap-3 py-2 px-4 hover:bg-surface-container-low rounded border-l-2 border-transparent hover:border-primary group transition-all">
+<div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+<div class="flex flex-col">
+<span class="font-ui-label-bold text-on-surface">AEGIS-01 HIGH RESOLUTION</span>
+<span class="font-data-mono text-outline text-[11px]">ID: SAT-8829-XL | 45.32°N 12.11°E</span>
+</div>
+<div class="ml-auto opacity-0 group-hover:opacity-100 flex gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline hover:text-primary">visibility</span>
+<span class="material-symbols-outlined text-[18px] text-outline hover:text-primary">analytics</span>
+</div>
+</div>
+<div class="flex items-center gap-3 py-2 px-4 hover:bg-surface-container-low rounded border-l-2 border-transparent hover:border-primary group transition-all bg-primary-container/5 border-primary">
+<div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+<div class="flex flex-col">
+<span class="font-ui-label-bold text-on-surface">AEGIS-02 THERMAL IMAGING</span>
+<span class="font-data-mono text-outline text-[11px]">ID: SAT-8830-XL | 12.00°S 44.92°W</span>
+</div>
+<div class="ml-auto flex gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">radio_button_checked</span>
+</div>
+</div>
+<div class="flex items-center gap-3 py-2 px-4 hover:bg-surface-container-low rounded border-l-2 border-transparent hover:border-primary group transition-all">
+<div class="w-2 h-2 rounded-full bg-amber-500"></div>
+<div class="flex flex-col">
+<span class="font-ui-label-bold text-on-surface">AEGIS-03 LWS</span>
+<span class="font-data-mono text-outline text-[11px]">ID: SAT-8831-XL | CALIBRATING</span>
+</div>
+<span class="ml-auto font-ui-label-bold text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">MAINTENANCE</span>
+</div>
+</div>
+<!-- Root: Ground Infrastructure -->
+<div class="flex items-center gap-2 py-4 group cursor-pointer hover:bg-surface-container-low px-2 rounded mt-4">
+<span class="material-symbols-outlined text-outline">keyboard_arrow_down</span>
+<span class="material-symbols-outlined text-primary">cell_tower</span>
+<span class="font-ui-header text-[15px]">Ground Stations [G-BASE]</span>
+<span class="ml-auto font-data-mono text-[11px] text-outline">2/3 ONLINE</span>
+</div>
+<div class="ml-8 space-y-1 border-l border-outline-variant">
+<div class="flex items-center gap-3 py-2 px-4 hover:bg-surface-container-low rounded border-l-2 border-transparent group transition-all">
+<div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+<div class="flex flex-col">
+<span class="font-ui-label-bold text-on-surface">NORAD-HUB-01</span>
+<span class="font-data-mono text-outline text-[11px]">ID: GSH-441-A | COLORADO SPRINGS</span>
+</div>
+</div>
+<div class="flex items-center gap-3 py-2 px-4 hover:bg-surface-container-low rounded border-l-2 border-transparent group transition-all">
+<div class="w-2 h-2 rounded-full bg-red-500"></div>
+<div class="flex flex-col">
+<span class="font-ui-label-bold text-on-surface">OSLO-HUB-04</span>
+<span class="font-data-mono text-outline text-[11px]">ID: GSH-444-F | OSLO, NORWAY</span>
+</div>
+<span class="ml-auto font-ui-label-bold text-[10px] text-red-600 bg-red-50 px-1.5 py-0.5 rounded">OFFLINE</span>
+</div>
+</div>
+<!-- Root: Field Units -->
+<div class="flex items-center gap-2 py-4 group cursor-pointer hover:bg-surface-container-low px-2 rounded mt-4">
+<span class="material-symbols-outlined text-outline">keyboard_arrow_down</span>
+<span class="material-symbols-outlined text-primary">precision_manufacturing</span>
+<span class="font-ui-header text-[15px]">Field Deployments [F-UNIT]</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Detail Panel -->
+<aside class="w-[sidebar_right] bg-white flex flex-col border-l border-outline-variant">
+<!-- Header Section -->
+<div class="p-6 border-b border-outline-variant bg-surface-container-low">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs font-ui-label-bold text-primary tracking-widest uppercase">Asset Profile</span>
+<button class="material-symbols-outlined text-outline hover:text-on-surface">close</button>
+</div>
+<h2 class="font-ui-header text-xl text-on-surface">AEGIS-02 THERMAL</h2>
+<p class="font-data-mono text-sm text-outline">SYS_ID: 8830-XL-BRAVO</p>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<!-- Status & Telemetry -->
+<section class="p-6 border-b border-outline-variant">
+<div class="flex items-center gap-2 mb-6">
+<div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+<span class="font-ui-label-bold text-emerald-700">LIVE CONNECTIVITY: 99.8%</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant">
+<p class="text-[10px] font-ui-label-bold text-outline uppercase mb-1">Orbit Speed</p>
+<p class="font-data-mono text-lg text-on-surface">7.67 km/s</p>
+</div>
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant">
+<p class="text-[10px] font-ui-label-bold text-outline uppercase mb-1">Altitude</p>
+<p class="font-data-mono text-lg text-on-surface">542.1 km</p>
+</div>
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant">
+<p class="text-[10px] font-ui-label-bold text-outline uppercase mb-1">Battery</p>
+<p class="font-data-mono text-lg text-on-surface">84.2%</p>
+</div>
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant">
+<p class="text-[10px] font-ui-label-bold text-outline uppercase mb-1">Temp (Core)</p>
+<p class="font-data-mono text-lg text-on-surface">14.2°C</p>
+</div>
+</div>
+</section>
+<!-- Last Known Location -->
+<section class="p-6 border-b border-outline-variant">
+<h3 class="font-ui-label-bold text-xs text-outline uppercase mb-4 tracking-widest">Geospatial Reference</h3>
+<div class="h-40 w-full bg-slate-200 rounded overflow-hidden relative border border-outline-variant">
+<img alt="Map view" class="w-full h-full object-cover grayscale opacity-50" data-alt="Abstract satellite imagery of a terrain with high-contrast topographic features and digital mapping overlays" data-location="South America" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH9uWYbPnnC4ivvdBEiSQGMqpTo_avWG1O8EffhYI3nZrYFL6yAeJP8CykkZkjvdaQcTimFfFDlID4aq-o4eKrYLkzXdlNo274uvhYYt5EDGfF-4Q6t7asutlkBKgFjiPABuTl2Hq3tTpTATGbgTvPiUHxiJBxFc-74GSQ-z8TycJ4MKfOAeazqGH7Blh1iZR6y1IKvpFDi1CN0rzZyKU5wrZLpasOCsrVBAhOCHBR6DsZwh24KOmni5g4JJq2vOx7sWT6rFX_62U"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-4 h-4 bg-primary rounded-full ring-4 ring-primary/20"></div>
+</div>
+</div>
+<div class="mt-4 font-data-mono text-xs text-on-surface space-y-1">
+<p>LAT: 12.00421 S</p>
+<p>LON: 44.92134 W</p>
+<p>FOV: 120° AZIMUTH</p>
+</div>
+</section>
+<!-- Active Missions -->
+<section class="p-6">
+<h3 class="font-ui-label-bold text-xs text-outline uppercase mb-4 tracking-widest">Active Missions</h3>
+<div class="space-y-3">
+<div class="p-3 border border-primary/20 bg-primary/5 rounded flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]">assignment_turned_in</span>
+<div>
+<p class="font-ui-label-bold text-sm text-on-surface">Operation Silver Hawk</p>
+<p class="text-[11px] text-outline mt-1">Thermal scanning for perimeter breaches in Sector 7-G.</p>
+</div>
+</div>
+<div class="p-3 border border-outline-variant rounded flex items-start gap-3 opacity-60">
+<span class="material-symbols-outlined text-outline text-[20px]">schedule</span>
+<div>
+<p class="font-ui-label-bold text-sm text-on-surface">Deep Sea Surveillance</p>
+<p class="text-[11px] text-outline mt-1">Scheduled transition to Atlantic Basin in 4h 22m.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Action Footer -->
+<div class="p-4 bg-white border-t border-outline-variant grid grid-cols-2 gap-2">
+<button class="px-4 py-2 bg-white border border-outline-variant rounded font-ui-label-bold text-xs hover:bg-surface-container-high transition-colors">DIAGNOSTICS</button>
+<button class="px-4 py-2 bg-primary text-white rounded font-ui-label-bold text-xs hover:brightness-110 transition-all">OVERRIDE</button>
+</div>
+</aside>
+</main>
+<!-- Command Bar -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-2xl z-50 px-4">
+<div class="bg-white/80 backdrop-blur-md border border-outline-variant shadow-lg rounded-xl flex items-center gap-4 px-6 py-4">
+<span class="font-data-mono text-primary text-lg">_</span>
+<input class="bg-transparent border-none focus:ring-0 flex-1 font-data-terminal text-sm text-on-surface placeholder:text-outline uppercase tracking-wider" placeholder="Issue orchestrator command..." type="text"/>
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-data-mono text-outline">ENTER TO EXECUTE</span>
+<span class="material-symbols-outlined text-primary">keyboard_command_key</span>
+</div>
+</div>
+</div>
+</body></html>

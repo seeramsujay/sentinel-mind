@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINELMIND Command Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-primary": "#ffffff", "on-secondary-fixed": "#00184a", "on-primary-fixed": "#00174b", "on-secondary-fixed-variant": "#2b4384", outline: "#737686", "inverse-surface": "#2e3039", "inverse-on-surface": "#f0f0fb", "on-tertiary-container": "#ffede6", "tertiary-fixed-dim": "#ffb596", "surface-dim": "#d9d9e5", "surface-variant": "#e1e2ed", "error-container": "#ffdad6", background: "#faf8ff", "surface-container": "#ededf9", "primary-container": "#2563eb", "surface-bright": "#faf8ff", "on-tertiary-fixed": "#360f00", "secondary-fixed-dim": "#b3c5ff", "on-error": "#ffffff", secondary: "#445c9d", primary: "#004ac6", "tertiary-fixed": "#ffdbcd", "primary-fixed-dim": "#b4c5ff", "on-surface-variant": "#434655", "outline-variant": "#c3c6d7", "on-background": "#191b23", "tertiary-container": "#bc4800", surface: "#faf8ff", "on-tertiary": "#ffffff", "surface-tint": "#0053db", "on-secondary": "#ffffff", "primary-fixed": "#dbe1ff", "secondary-fixed": "#dbe1ff", tertiary: "#943700", "on-tertiary-fixed-variant": "#7d2d00", "inverse-primary": "#b4c5ff", "on-secondary-container": "#2d4686", "secondary-container": "#9fb7ff", "on-surface": "#191b23", "surface-container-highest": "#e1e2ed", "on-error-container": "#93000a", "on-primary-fixed-variant": "#003ea8", "on-primary-container": "#eeefff", "surface-container-high": "#e7e7f3", "surface-container-low": "#f3f3fe", "surface-container-lowest": "#ffffff", error: "#ba1a1a", "brand-canvas": "#EEF2F7", "brand-border": "#DDE3EE"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, fontFamily: {"ui-label-bold": ["Inter"], "data-terminal": ["Geist Mono"], "data-mono": ["Geist Mono"], "ui-header": ["Inter"], "body-medium": ["Inter"], "body-prose": ["Inter"], "display-brand": ["Inter"]}, fontSize: {"ui-label-bold": ["12px", {lineHeight: "100%", letterSpacing: "0.05em", fontWeight: "600"}], "data-terminal": ["12px", {lineHeight: "140%", fontWeight: "300"}], "data-mono": ["13px", {lineHeight: "150%", fontWeight: "400"}], "ui-header": ["18px", {lineHeight: "140%", fontWeight: "700"}], "body-medium": ["15px", {lineHeight: "160%", fontWeight: "500"}], "body-prose": ["15px", {lineHeight: "160%", fontWeight: "400"}], "display-brand": ["24px", {lineHeight: "120%", letterSpacing: "-0.02em", fontWeight: "800"}]}, spacing: {gutter: "16px", sidebar_left: "280px", unit: "4px", sidebar_right: "320px", margin: "24px"}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .frosted {
+            backdrop-filter: blur(20px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .pulsing {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+        .terminal-scroll::-webkit-scrollbar { width: 4px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: transparent; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: #DDE3EE; border-radius: 2px; }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}[type='text'],input:where(:not([type])),[type='email'],[type='url'],[type='password'],[type='number'],[type='date'],[type='datetime-local'],[type='month'],[type='search'],[type='tel'],[type='time'],[type='week'],[multiple],textarea,select{-webkit-appearance:none;appearance:none;background-color:#fff;border-color:#6b7280;border-width:1px;border-radius:0px;padding-top:0.5rem;padding-right:0.75rem;padding-bottom:0.5rem;padding-left:0.75rem;font-size:1rem;line-height:1.5rem;--tw-shadow:0 0 #0000;}[type='text']:focus, input:where(:not([type])):focus, [type='email']:focus, [type='url']:focus, [type='password']:focus, [type='number']:focus, [type='date']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='search']:focus, [type='tel']:focus, [type='time']:focus, [type='week']:focus, [multiple]:focus, textarea:focus, select:focus{outline:2px solid transparent;outline-offset:2px;--tw-ring-inset:var(--tw-empty,/*!*/ /*!*/);--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:#2563eb;--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);border-color:#2563eb}input::placeholder,textarea::placeholder{color:#6b7280;opacity:1}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-date-and-time-value{min-height:1.5em;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit,::-webkit-datetime-edit-year-field,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute-field,::-webkit-datetime-edit-second-field,::-webkit-datetime-edit-millisecond-field,::-webkit-datetime-edit-meridiem-field{padding-top:0;padding-bottom:0}select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");background-position:right 0.5rem center;background-repeat:no-repeat;background-size:1.5em 1.5em;padding-right:2.5rem;print-color-adjust:exact}[multiple],[size]:where(select:not([size="1"])){background-image:initial;background-position:initial;background-repeat:unset;background-size:initial;padding-right:0.75rem;print-color-adjust:unset}[type='checkbox'],[type='radio']{-webkit-appearance:none;appearance:none;padding:0;print-color-adjust:exact;display:inline-block;vertical-align:middle;background-origin:border-box;-webkit-user-select:none;user-select:none;flex-shrink:0;height:1rem;width:1rem;color:#2563eb;background-color:#fff;border-color:#6b7280;border-width:1px;--tw-shadow:0 0 #0000}[type='checkbox']{border-radius:0px}[type='radio']{border-radius:100%}[type='checkbox']:focus,[type='radio']:focus{outline:2px solid transparent;outline-offset:2px;--tw-ring-inset:var(--tw-empty,/*!*/ /*!*/);--tw-ring-offset-width:2px;--tw-ring-offset-color:#fff;--tw-ring-color:#2563eb;--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}[type='checkbox']:checked,[type='radio']:checked{border-color:transparent;background-color:currentColor;background-size:100% 100%;background-position:center;background-repeat:no-repeat}[type='checkbox']:checked{background-image:url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");}@media (forced-colors: active) {[type='checkbox']:checked{-webkit-appearance:auto;appearance:auto}}[type='radio']:checked{background-image:url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");}@media (forced-colors: active) {[type='radio']:checked{-webkit-appearance:auto;appearance:auto}}[type='checkbox']:checked:hover,[type='checkbox']:checked:focus,[type='radio']:checked:hover,[type='radio']:checked:focus{border-color:transparent;background-color:currentColor}[type='checkbox']:indeterminate{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3e%3cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3e%3c/svg%3e");border-color:transparent;background-color:currentColor;background-size:100% 100%;background-position:center;background-repeat:no-repeat;}@media (forced-colors: active) {[type='checkbox']:indeterminate{-webkit-appearance:auto;appearance:auto}}[type='checkbox']:indeterminate:hover,[type='checkbox']:indeterminate:focus{border-color:transparent;background-color:currentColor}[type='file']{background:unset;border-color:inherit;border-width:0;border-radius:0;padding:0;font-size:unset;line-height:inherit}[type='file']:focus{outline:1px solid ButtonText;outline:1px auto -webkit-focus-ring-color}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.-top-10{top:-2.5rem}.bottom-24{bottom:6rem}.bottom-6{bottom:1.5rem}.left-1\/2{left:50%}.left-1\/3{left:33.333333%}.left-3{left:0.75rem}.left-6{left:1.5rem}.right-1\/4{right:25%}.right-6{right:1.5rem}.top-0{top:0px}.top-1\/2{top:50%}.top-1\/4{top:25%}.top-6{top:1.5rem}.z-50{z-index:50}.mb-0{margin-bottom:0px}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mr-2{margin-right:0.5rem}.mt-14{margin-top:3.5rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.block{display:block}.flex{display:flex}.h-1{height:0.25rem}.h-1\.5{height:0.375rem}.h-10{height:2.5rem}.h-12{height:3rem}.h-14{height:3.5rem}.h-16{height:4rem}.h-2{height:0.5rem}.h-20{height:5rem}.h-3{height:0.75rem}.h-4{height:1rem}.h-\[1024px\]{height:1024px}.h-full{height:100%}.w-10{width:2.5rem}.w-12{width:3rem}.w-16{width:4rem}.w-2{width:0.5rem}.w-3{width:0.75rem}.w-4{width:1rem}.w-64{width:16rem}.w-\[100\%\]{width:100%}.w-\[14\%\]{width:14%}.w-\[280px\]{width:280px}.w-\[320px\]{width:320px}.w-\[45\%\]{width:45%}.w-\[48\%\]{width:48%}.w-\[50\%\]{width:50%}.w-\[62\%\]{width:62%}.w-\[78\%\]{width:78%}.w-\[85\%\]{width:85%}.w-\[88\%\]{width:88%}.w-\[94\%\]{width:94%}.w-\[98\%\]{width:98%}.w-full{width:100%}.max-w-5xl{max-width:64rem}.flex-1{flex:1 1 0%}.-translate-x-1\/2{--tw-translate-x:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.-translate-y-1\/2{--tw-translate-y:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-pointer{cursor:pointer}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:2px}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:12px}.rounded-lg{border-radius:4px}.rounded-xl{border-radius:8px}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-l{border-left-width:1px}.border-l-2{border-left-width:2px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-none{border-style:none}.border-amber-100{--tw-border-opacity:1;border-color:rgb(254 243 199 / var(--tw-border-opacity, 1))}.border-amber-500{--tw-border-opacity:1;border-color:rgb(245 158 11 / var(--tw-border-opacity, 1))}.border-blue-100{--tw-border-opacity:1;border-color:rgb(219 234 254 / var(--tw-border-opacity, 1))}.border-blue-500{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.border-brand-border{--tw-border-opacity:1;border-color:rgb(221 227 238 / var(--tw-border-opacity, 1))}.border-emerald-200{--tw-border-opacity:1;border-color:rgb(167 243 208 / var(--tw-border-opacity, 1))}.border-emerald-500{--tw-border-opacity:1;border-color:rgb(16 185 129 / var(--tw-border-opacity, 1))}.border-error{--tw-border-opacity:1;border-color:rgb(186 26 26 / var(--tw-border-opacity, 1))}.border-error\/20{border-color:rgb(186 26 26 / 0.2)}.border-error\/30{border-color:rgb(186 26 26 / 0.3)}.border-orange-200{--tw-border-opacity:1;border-color:rgb(254 215 170 / var(--tw-border-opacity, 1))}.border-red-100{--tw-border-opacity:1;border-color:rgb(254 226 226 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-white{--tw-border-opacity:1;border-color:rgb(255 255 255 / var(--tw-border-opacity, 1))}.border-white\/50{border-color:rgb(255 255 255 / 0.5)}.border-white\/60{border-color:rgb(255 255 255 / 0.6)}.bg-\[\#E8EFF9\]{--tw-bg-opacity:1;background-color:rgb(232 239 249 / var(--tw-bg-opacity, 1))}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-500\/20{background-color:rgb(59 130 246 / 0.2)}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-brand-canvas{--tw-bg-opacity:1;background-color:rgb(238 242 247 / var(--tw-bg-opacity, 1))}.bg-emerald-50{--tw-bg-opacity:1;background-color:rgb(236 253 245 / var(--tw-bg-opacity, 1))}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-error{--tw-bg-opacity:1;background-color:rgb(186 26 26 / var(--tw-bg-opacity, 1))}.bg-error-container{--tw-bg-opacity:1;background-color:rgb(255 218 214 / var(--tw-bg-opacity, 1))}.bg-error\/20{background-color:rgb(186 26 26 / 0.2)}.bg-orange-100{--tw-bg-opacity:1;background-color:rgb(255 237 213 / var(--tw-bg-opacity, 1))}.bg-primary{--tw-bg-opacity:1;background-color:rgb(0 74 198 / var(--tw-bg-opacity, 1))}.bg-red-50{--tw-bg-opacity:1;background-color:rgb(254 242 242 / var(--tw-bg-opacity, 1))}.bg-red-50\/50{background-color:rgb(254 242 242 / 0.5)}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-200{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-50\/50{background-color:rgb(248 250 252 / 0.5)}.bg-transparent{background-color:transparent}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/40{background-color:rgb(255 255 255 / 0.4)}.bg-white\/50{background-color:rgb(255 255 255 / 0.5)}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.pl-3{padding-left:0.75rem}.pl-6{padding-left:1.5rem}.pl-9{padding-left:2.25rem}.pr-4{padding-right:1rem}.pt-2{padding-top:0.5rem}.pt-3{padding-top:0.75rem}.text-center{text-align:center}.text-right{text-align:right}.font-body-medium{font-family:Instrument Sans}.font-body-prose{font-family:Instrument Sans}.font-data-mono{font-family:Geist Mono}.font-data-terminal{font-family:Geist Mono}.font-display-brand{font-family:DM Sans}.font-ui-header{font-family:Sora}.font-ui-label-bold{font-family:Sora}.text-\[10px\]{font-size:10px}.text-\[12px\]{font-size:12px}.text-\[14px\]{font-size:14px}.text-\[18px\]{font-size:18px}.text-\[8px\]{font-size:8px}.text-\[9px\]{font-size:9px}.text-data-terminal{font-size:12px;line-height:140%;font-weight:300}.text-display-brand{font-size:24px;line-height:120%;letter-spacing:-0.02em;font-weight:800}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-ui-label-bold{font-size:12px;line-height:100%;letter-spacing:0.05em;font-weight:600}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-none{line-height:1}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-emerald-700{--tw-text-opacity:1;color:rgb(4 120 87 / var(--tw-text-opacity, 1))}.text-error{--tw-text-opacity:1;color:rgb(186 26 26 / var(--tw-text-opacity, 1))}.text-on-error-container{--tw-text-opacity:1;color:rgb(147 0 10 / var(--tw-text-opacity, 1))}.text-on-surface{--tw-text-opacity:1;color:rgb(25 27 35 / var(--tw-text-opacity, 1))}.text-orange-800{--tw-text-opacity:1;color:rgb(154 52 18 / var(--tw-text-opacity, 1))}.text-primary{--tw-text-opacity:1;color:rgb(0 74 198 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.placeholder-slate-400::placeholder{--tw-placeholder-opacity:1;color:rgb(148 163 184 / var(--tw-placeholder-opacity, 1))}.opacity-40{opacity:0.4}.opacity-60{opacity:0.6}.opacity-80{opacity:0.8}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-primary\/20{--tw-shadow-color:rgb(0 74 198 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:border-primary\/30:hover{border-color:rgb(0 74 198 / 0.3)}.hover\:bg-primary\/90:hover{background-color:rgb(0 74 198 / 0.9)}.hover\:bg-slate-50:hover{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.focus\:border-primary:focus{--tw-border-opacity:1;border-color:rgb(0 74 198 / var(--tw-border-opacity, 1))}.focus\:ring-0:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-1:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-primary:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(0 74 198 / var(--tw-ring-opacity, 1))}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.active\:opacity-80:active{opacity:0.8}.dark\:bg-slate-900:is(.dark *){--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}</style></head>
+<body class="bg-brand-canvas text-on-surface font-body-prose overflow-hidden h-[1024px] flex flex-col" data-mode="connect" data-stitch-vh="h-[1024px]===h-screen">
+<!-- TopAppBar -->
+<header class="bg-white dark:bg-slate-900 h-14 border-b border-brand-border w-full fixed top-0 z-50 flex justify-between items-center px-4">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<svg class="text-primary" fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M12 6L7 9V15L12 18L17 15V9L12 6Z" fill="currentColor"></path>
+</svg>
+<span class="font-display-brand text-display-brand uppercase">SENTINELMIND</span>
+</div>
+<div class="flex items-center gap-3 border-l border-brand-border pl-6">
+<div class="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200">
+<span class="w-2 h-2 bg-emerald-500 rounded-full pulsing"></span>
+<span class="font-ui-label-bold text-ui-label-bold">OPERATIONAL</span>
+</div>
+<div class="flex gap-2">
+<span class="bg-error-container text-on-error-container font-ui-label-bold text-[10px] px-2 py-0.5 rounded border border-error/20">2 CRITICAL</span>
+<span class="bg-orange-100 text-orange-800 font-ui-label-bold text-[10px] px-2 py-0.5 rounded border border-orange-200">5 HIGH</span>
+<span class="bg-slate-100 text-slate-600 font-ui-label-bold text-[10px] px-2 py-0.5 rounded border border-slate-200">12 MED</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-slate-50 border border-brand-border rounded text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all w-64" placeholder="Search system assets..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-slate-50 rounded-lg text-slate-500 cursor-pointer active:opacity-80 transition-colors">
+<span class="material-symbols-outlined">notifications_active</span>
+</button>
+<button class="p-2 hover:bg-slate-50 rounded-lg text-slate-500 cursor-pointer active:opacity-80 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 hover:bg-slate-50 rounded-lg text-slate-500 cursor-pointer active:opacity-80 transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex flex-1 mt-14 mb-0 overflow-hidden">
+<!-- Left Sidebar: Agent Feed -->
+<aside class="w-[280px] bg-slate-50 border-r border-brand-border flex flex-col overflow-hidden">
+<div class="p-4 border-b border-brand-border bg-white">
+<h2 class="font-ui-label-bold text-ui-label-bold text-slate-500 uppercase tracking-widest">AGENT FEED</h2>
+<div class="mt-2 flex items-center justify-between text-[10px] font-data-terminal text-slate-400 uppercase">
+<span>Active Stream</span>
+<span class="text-blue-600">Syncing...</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-3 font-data-terminal text-data-terminal terminal-scroll space-y-3">
+<!-- Log Dispatch -->
+<div class="border-l-2 border-blue-500 pl-3 py-1 space-y-1 bg-white/50">
+<div class="flex justify-between opacity-60">
+<span>[14:22:01]</span>
+<span class="text-blue-600">DISPATCH</span>
+</div>
+<p class="text-slate-800">Unit Alpha-9 deploying to Sector 7G. Visual confirmation pending.</p>
+</div>
+<!-- Log Triage -->
+<div class="border-l-2 border-amber-500 pl-3 py-1 space-y-1 bg-white/50">
+<div class="flex justify-between opacity-60">
+<span>[14:21:45]</span>
+<span class="text-amber-600">TRIAGE</span>
+</div>
+<p class="text-slate-800">Anomaly detected in grid cluster B4. Priority escalated to HIGH.</p>
+</div>
+<!-- Log Conflict -->
+<div class="border-l-2 border-error pl-3 py-1 space-y-1 bg-red-50/50">
+<div class="flex justify-between opacity-60">
+<span>[14:21:12]</span>
+<span class="text-error">CONFLICT</span>
+</div>
+<p class="text-slate-800">Permission denied for Agent 12. Policy violation in resource sharing.</p>
+</div>
+<!-- Log Resolve -->
+<div class="border-l-2 border-emerald-500 pl-3 py-1 space-y-1 bg-white/50">
+<div class="flex justify-between opacity-60">
+<span>[14:20:50]</span>
+<span class="text-emerald-600">RESOLVE</span>
+</div>
+<p class="text-slate-800">Threat neutralized in Zone 4. Reverting to standby protocols.</p>
+</div>
+<div class="border-l-2 border-blue-500 pl-3 py-1 space-y-1 bg-white/50">
+<div class="flex justify-between opacity-60">
+<span>[14:20:01]</span>
+<span class="text-blue-600">DISPATCH</span>
+</div>
+<p class="text-slate-800">Recalibrating LiDAR sensors across northern perimeter.</p>
+</div>
+<div class="border-l-2 border-slate-300 pl-3 py-1 space-y-1 bg-white/50 italic opacity-60">
+<div class="flex justify-between">
+<span>[14:18:55]</span>
+<span>SYSTEM</span>
+</div>
+<p>Internal heartbeat check: ALL SYSTEMS NOMINAL</p>
+</div>
+</div>
+</aside>
+<!-- Center Panel: Tactical Map -->
+<section class="flex-1 relative bg-[#E8EFF9] overflow-hidden">
+<!-- Map Decorative SVG Background -->
+<div class="absolute inset-0 opacity-40">
+<svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="40" id="grid" patternunits="userSpaceOnUse" width="40">
+<path d="M 40 0 L 0 0 0 40" fill="none" stroke="#A9C0E4" stroke-width="0.5"></path>
+</pattern>
+</defs>
+<rect fill="url(#grid)" height="100%" width="100%"></rect>
+</svg>
+</div>
+<!-- Map Content Simulation -->
+<div class="relative w-full h-full flex items-center justify-center">
+<!-- Dashed Flow Lines -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none">
+<path d="M 200 200 Q 400 100 600 300" fill="none" opacity="0.4" stroke="#2563eb" stroke-dasharray="8 4" stroke-width="2"></path>
+<path d="M 600 300 Q 800 500 1000 200" fill="none" opacity="0.4" stroke="#2563eb" stroke-dasharray="8 4" stroke-width="2"></path>
+</svg>
+<!-- Incident Markers -->
+<div class="absolute top-1/4 left-1/3">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-12 h-12 bg-blue-500/20 rounded-full pulsing"></div>
+<div class="w-3 h-3 bg-blue-600 rounded-full border-2 border-white"></div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm border border-brand-border whitespace-nowrap">
+<span class="font-ui-label-bold text-[10px]">ALPHA-9</span>
+</div>
+</div>
+</div>
+<div class="absolute top-1/2 right-1/4">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-16 h-16 bg-error/20 rounded-full pulsing" style="animation-delay: 0.5s;"></div>
+<div class="w-4 h-4 bg-error rounded-full border-2 border-white"></div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm border border-error/30 whitespace-nowrap">
+<span class="font-ui-label-bold text-[10px] text-error">INCIDENT #402</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Frosted Glass Overlay: Swarm Status -->
+<div class="absolute top-6 left-6 frosted p-4 border border-white/50 rounded-xl shadow-lg w-64">
+<div class="flex items-center justify-between mb-4">
+<span class="font-ui-label-bold text-ui-label-bold">LIVE SWARM STATUS</span>
+<span class="material-symbols-outlined text-blue-600">hub</span>
+</div>
+<div class="space-y-3">
+<div>
+<div class="flex justify-between font-data-terminal text-[10px] mb-1">
+<span>COHESION</span>
+<span>98%</span>
+</div>
+<div class="h-1 bg-blue-100 rounded-full overflow-hidden">
+<div class="h-full bg-blue-600 w-[98%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-data-terminal text-[10px] mb-1">
+<span>LATENCY (AVG)</span>
+<span>14ms</span>
+</div>
+<div class="h-1 bg-blue-100 rounded-full overflow-hidden">
+<div class="h-full bg-blue-600 w-[14%]"></div>
+</div>
+</div>
+<div class="flex gap-2 pt-2">
+<div class="flex-1 bg-white/40 border border-white p-2 rounded">
+<span class="block text-[18px] font-data-mono">24</span>
+<span class="block text-[8px] font-ui-label-bold text-slate-500">AGENTS</span>
+</div>
+<div class="flex-1 bg-white/40 border border-white p-2 rounded">
+<span class="block text-[18px] font-data-mono">08</span>
+<span class="block text-[8px] font-ui-label-bold text-slate-500">ZONES</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Map Controls (Bottom Right) -->
+<div class="absolute bottom-24 right-6 flex flex-col gap-2">
+<button class="w-10 h-10 bg-white border border-brand-border rounded shadow-sm flex items-center justify-center hover:bg-slate-50"><span class="material-symbols-outlined">add</span></button>
+<button class="w-10 h-10 bg-white border border-brand-border rounded shadow-sm flex items-center justify-center hover:bg-slate-50"><span class="material-symbols-outlined">remove</span></button>
+<button class="w-10 h-10 bg-white border border-brand-border rounded shadow-sm flex items-center justify-center hover:bg-slate-50"><span class="material-symbols-outlined">layers</span></button>
+</div>
+</section>
+<!-- Right Sidebar: Transparency & SitReps -->
+<aside class="w-[320px] bg-white border-l border-brand-border flex flex-col">
+<!-- Transparency Panel -->
+<div class="p-4 border-b border-brand-border bg-slate-50/50">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-ui-label-bold text-ui-label-bold uppercase">Transparency</h2>
+<span class="material-symbols-outlined text-sm text-slate-400">info</span>
+</div>
+<div class="space-y-4">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-body-medium text-[12px]">Northern Perimeter</span>
+<div class="flex gap-1">
+<span class="bg-blue-50 text-blue-600 text-[9px] px-1.5 py-0.5 rounded font-ui-label-bold">OPTIMIZED</span>
+</div>
+</div>
+<div class="relative h-2 bg-slate-200 rounded-full overflow-hidden">
+<div class="absolute inset-0 bg-blue-100 w-[85%]"></div> <!-- Ghost/Target -->
+<div class="absolute inset-0 bg-blue-600 w-[62%] transition-all"></div> <!-- Solid/Actual -->
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-body-medium text-[12px]">Urban Core Logistics</span>
+<div class="flex gap-1">
+<span class="bg-amber-50 text-amber-600 text-[9px] px-1.5 py-0.5 rounded font-ui-label-bold">BIAS DETECTED</span>
+</div>
+</div>
+<div class="relative h-2 bg-slate-200 rounded-full overflow-hidden">
+<div class="absolute inset-0 bg-blue-100 w-[45%]"></div>
+<div class="absolute inset-0 bg-blue-600 w-[78%] transition-all"></div>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-body-medium text-[12px]">Eastern Hub</span>
+</div>
+<div class="relative h-2 bg-slate-200 rounded-full overflow-hidden">
+<div class="absolute inset-0 bg-blue-100 w-[50%]"></div>
+<div class="absolute inset-0 bg-blue-600 w-[48%] transition-all"></div>
+</div>
+</div>
+</div>
+<div class="mt-4 flex gap-2">
+<span class="flex-1 text-center bg-slate-100 py-1.5 rounded text-[10px] font-ui-label-bold text-slate-500 uppercase border border-slate-200">Audit Logs</span>
+<span class="flex-1 text-center bg-slate-100 py-1.5 rounded text-[10px] font-ui-label-bold text-slate-500 uppercase border border-slate-200">Ethics Protocol</span>
+</div>
+</div>
+<!-- RAG SitReps -->
+<div class="flex-1 flex flex-col overflow-hidden">
+<div class="p-4 border-b border-brand-border bg-white flex items-center justify-between">
+<h2 class="font-ui-label-bold text-ui-label-bold uppercase">RAG SitReps</h2>
+<span class="text-[10px] font-data-mono text-slate-400">Total: 12</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- SitRep Card 1 -->
+<div class="p-3 border border-brand-border rounded-xl bg-white shadow-sm hover:border-primary/30 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-red-50 text-error text-[10px] px-2 py-0.5 rounded font-ui-label-bold border border-red-100">CRITICAL</span>
+<span class="font-data-mono text-[10px] text-slate-400">14:15:00</span>
+</div>
+<h3 class="font-ui-header text-[14px] mb-1">Asset Collision Near Gate A</h3>
+<p class="text-[12px] text-slate-500 mb-3">Collision avoidance protocol engaged. Two units disabled. Emergency triage required for data recovery.</p>
+<div class="pt-3 border-t border-brand-border flex items-center justify-between">
+<div class="flex-1 pr-4">
+<div class="flex justify-between text-[9px] font-ui-label-bold text-slate-400 mb-1">
+<span>CONFIDENCE</span>
+<span>94%</span>
+</div>
+<div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 w-[94%]"></div>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">arrow_forward</span>
+</div>
+</div>
+<!-- SitRep Card 2 -->
+<div class="p-3 border border-brand-border rounded-xl bg-white shadow-sm hover:border-primary/30 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-amber-50 text-amber-600 text-[10px] px-2 py-0.5 rounded font-ui-label-bold border border-amber-100">STABILITY</span>
+<span class="font-data-mono text-[10px] text-slate-400">14:10:22</span>
+</div>
+<h3 class="font-ui-header text-[14px] mb-1">Network Convergence Alert</h3>
+<p class="text-[12px] text-slate-500 mb-3">Mesh network node saturation at 82%. Automated rerouting initialized.</p>
+<div class="pt-3 border-t border-brand-border flex items-center justify-between">
+<div class="flex-1 pr-4">
+<div class="flex justify-between text-[9px] font-ui-label-bold text-slate-400 mb-1">
+<span>CONFIDENCE</span>
+<span>88%</span>
+</div>
+<div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 w-[88%]"></div>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">arrow_forward</span>
+</div>
+</div>
+<!-- SitRep Card 3 -->
+<div class="p-3 border border-brand-border rounded-xl bg-white shadow-sm hover:border-primary/30 transition-all cursor-pointer opacity-80">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded font-ui-label-bold border border-blue-100">ROUTINE</span>
+<span class="font-data-mono text-[10px] text-slate-400">13:55:12</span>
+</div>
+<h3 class="font-ui-header text-[14px] mb-1">Shift Handover: Delta Team</h3>
+<p class="text-[12px] text-slate-500 mb-3">Delta team transitioned to active monitoring. All parameters within safe threshold.</p>
+<div class="pt-3 border-t border-brand-border flex items-center justify-between">
+<div class="flex-1 pr-4">
+<div class="flex justify-between text-[9px] font-ui-label-bold text-slate-400 mb-1">
+<span>CONFIDENCE</span>
+<span>100%</span>
+</div>
+<div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 w-[100%]"></div>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- Command Bar -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-5xl h-20 frosted border border-white/60 rounded-2xl shadow-2xl z-50 flex items-center px-6 gap-6">
+<!-- Action Button -->
+<button class="h-12 bg-primary text-white font-ui-label-bold px-6 rounded-xl flex items-center gap-3 hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 whitespace-nowrap">
+<span class="material-symbols-outlined">cloud_upload</span>
+            UPLOAD FIELD IMAGE
+        </button>
+<!-- Command Input -->
+<div class="flex-1 h-12 bg-white/40 border border-brand-border rounded-xl px-4 flex items-center">
+<span class="font-data-mono text-primary mr-2">_</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-data-mono text-sm text-slate-800 placeholder-slate-400" placeholder="Enter orchestration command..." type="text"/>
+</div>
+<!-- Metrics Cards -->
+<div class="flex gap-4 border-l border-brand-border pl-6">
+<div class="text-right">
+<span class="block text-[18px] font-data-mono leading-none">2.4m</span>
+<span class="block text-[8px] font-ui-label-bold text-slate-500 tracking-wider">AVG RESPONSE</span>
+</div>
+<div class="text-right">
+<span class="block text-[18px] font-data-mono leading-none">148</span>
+<span class="block text-[8px] font-ui-label-bold text-slate-500 tracking-wider">ACTIVE AGENTS</span>
+</div>
+<div class="text-right">
+<span class="block text-[18px] font-data-mono leading-none text-emerald-600">92%</span>
+<span class="block text-[8px] font-ui-label-bold text-slate-500 tracking-wider">RESOLVED</span>
+</div>
+</div>
+</div>
+</body></html>

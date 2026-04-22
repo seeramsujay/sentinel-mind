@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SentinelMind | Vision Entry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-highest": "#e1e2ed", "on-surface-variant": "#434655", "inverse-on-surface": "#f0f0fb", "surface-container-high": "#e7e7f3", "on-tertiary-fixed": "#360f00", "tertiary-fixed": "#ffdbcd", "primary-fixed-dim": "#b4c5ff", "tertiary-container": "#bc4800", "primary-container": "#2563eb", "inverse-surface": "#2e3039", primary: "#004ac6", "on-tertiary-container": "#ffede6", "surface-dim": "#d9d9e5", surface: "#faf8ff", "secondary-fixed-dim": "#b3c5ff", "error-container": "#ffdad6", "on-background": "#191b23", "on-primary": "#ffffff", "tertiary-fixed-dim": "#ffb596", "surface-container": "#ededf9", "surface-container-low": "#f3f3fe", "on-primary-container": "#eeefff", "inverse-primary": "#b4c5ff", outline: "#737686", "on-tertiary-fixed-variant": "#7d2d00", "surface-tint": "#0053db", "secondary-container": "#9fb7ff", "on-secondary-fixed": "#00184a", secondary: "#445c9d", "on-tertiary": "#ffffff", "surface-variant": "#e1e2ed", "secondary-fixed": "#dbe1ff", "outline-variant": "#c3c6d7", background: "#faf8ff", "on-error-container": "#93000a", "primary-fixed": "#dbe1ff", "surface-bright": "#faf8ff", "on-surface": "#191b23", "surface-container-lowest": "#ffffff", "on-secondary-fixed-variant": "#2b4384", "on-primary-fixed-variant": "#003ea8", "on-secondary-container": "#2d4686", error: "#ba1a1a", "on-error": "#ffffff", tertiary: "#943700", "on-secondary": "#ffffff", "on-primary-fixed": "#00174b"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {sidebar_left: "280px", sidebar_right: "320px", gutter: "16px", unit: "4px", margin: "24px"}, fontFamily: {"body-medium": ["Inter"], "data-terminal": ["Geist Mono"], "data-mono": ["Geist Mono"], "ui-label-bold": ["Inter"], "ui-header": ["Inter"], "display-brand": ["Inter"], "body-prose": ["Inter"]}, fontSize: {"body-medium": ["15px", {lineHeight: "160%", fontWeight: "500"}], "data-terminal": ["12px", {lineHeight: "140%", fontWeight: "300"}], "data-mono": ["13px", {lineHeight: "150%", fontWeight: "400"}], "ui-label-bold": ["12px", {lineHeight: "100%", letterSpacing: "0.05em", fontWeight: "600"}], "ui-header": ["18px", {lineHeight: "140%", fontWeight: "700"}], "display-brand": ["24px", {lineHeight: "120%", letterSpacing: "-0.02em", fontWeight: "800"}], "body-prose": ["15px", {lineHeight: "160%", fontWeight: "400"}]}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .hex-background {
+            background-color: #EEF2F7;
+            background-image: radial-gradient(#DDE3EE 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .frosted-glass {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        @keyframes slow-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-slow-rotate {
+            animation: slow-rotate 60s linear infinite;
+        }
+        .scanning-line {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #2563eb, transparent);
+            position: absolute;
+            width: 100%;
+            top: 0;
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-[#EEF2F7] font-body-medium text-on-background min-h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 bg-white dark:bg-slate-900 h-14 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center gap-4">
+<span class="font-['Sora'] font-black text-blue-600 text-lg tracking-tighter">SENTINELMIND</span>
+<div class="h-6 w-[1px] bg-slate-200 mx-2"></div>
+<nav class="flex gap-6 items-center">
+<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 font-['Sora'] font-semibold tracking-tight h-14 flex items-center" href="#">Field Upload</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-100 font-['Sora'] font-semibold tracking-tight h-14 flex items-center px-2" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-100 font-['Sora'] font-semibold tracking-tight h-14 flex items-center px-2" href="#">Asset Tree</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-500" data-icon="notifications_active">notifications_active</span>
+<span class="material-symbols-outlined text-slate-500" data-icon="settings">settings</span>
+<span class="material-symbols-outlined text-slate-500" data-icon="help_outline">help_outline</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-slate-200 border border-slate-300 overflow-hidden">
+<img alt="Operator Profile" data-alt="close up headshot portrait of a professional system operator in a clean white studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsMTo8u5ZNM35_TD9n_eQkLZZKxHfSXtogoVmyI3Ur8V3pRjJzG-q6tFpOjIegetEEIThzsylhGfVdgJOW0hstEEJqeeqjd8SqF6f2rJNHg4LkxBFJ0mQ7R9L0da2YT-RzzYon70QZppjlDak6AWtkXJWxhHYz_OYlRejxOirDzZHp6OAJ4twsm7GT2nZaG2NPmQl8e6EMvGMYmFVgsM1WhFCFs8Ky8WX8dZQzEXzqXWbYzb9qaOabOI3bmtbNMqg8g4iY1Ezonow"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-0 mt-14 h-[calc(100vh-56px)] flex">
+<!-- Center Column: Vision Entry (75%) -->
+<section class="flex-grow p-6 flex flex-col gap-6 border-r border-slate-200 overflow-y-auto">
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-['DM_Sans'] text-2xl font-extrabold text-slate-900 tracking-tight">Vision Entry</h1>
+<p class="text-slate-500 font-body-medium">Telemetry source: Field Operator Unit-7</p>
+</div>
+<div class="flex gap-2">
+<span class="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-[10px] font-['Geist_Mono'] border border-blue-100">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> LINK_ACTIVE
+                    </span>
+<span class="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-[10px] font-['Geist_Mono'] border border-emerald-100">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> SECURE_CHANNEL
+                    </span>
+</div>
+</div>
+<!-- Large Upload Area -->
+<div class="flex-grow bg-white border border-[#DDE3EE] rounded-lg shadow-sm relative overflow-hidden flex flex-col items-center justify-center hex-background group cursor-pointer transition-all hover:border-blue-400">
+<!-- Rotating Background Hexagon -->
+<div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+<svg class="w-96 h-96 animate-slow-rotate" viewbox="0 0 100 100">
+<polygon fill="none" points="50,1 95,25 95,75 50,99 5,75 5,25" stroke="#2563eb" stroke-width="0.5"></polygon>
+</svg>
+</div>
+<!-- Scanning Animation (Hidden by default, shown on focus/drag) -->
+<div class="scanning-line"></div>
+<!-- Hexagonal Target -->
+<div class="relative w-48 h-48 flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full" viewbox="0 0 100 100">
+<polygon class="group-hover:stroke-blue-600 transition-colors" fill="none" points="50,5 93,30 93,70 50,95 7,70 7,30" stroke="#2563eb" stroke-dasharray="4 4" stroke-width="1.5"></polygon>
+</svg>
+<div class="flex flex-col items-center gap-3 text-blue-600">
+<span class="material-symbols-outlined text-5xl" data-icon="cloud_upload">cloud_upload</span>
+<span class="font-['Sora'] font-bold text-xs tracking-widest uppercase">Drop Imagery</span>
+</div>
+</div>
+<div class="mt-8 text-center">
+<p class="font-['Sora'] font-bold text-slate-800">DRAG_AND_DROP_FIELD_DATA</p>
+<p class="text-slate-400 text-xs mt-1 font-['Geist_Mono']">SUPPORTED: RAW, JPG, NITF-2.1, PNG</p>
+</div>
+<!-- Processing Overlay (Simulated State) -->
+<div class="absolute bottom-12 w-full px-24">
+<div class="flex justify-between items-center mb-2">
+<span class="font-['Geist_Mono'] text-[10px] text-blue-600 font-bold uppercase tracking-widest">Processing Intelligence...</span>
+<span class="font-['Geist_Mono'] text-[10px] text-blue-600 font-bold">64.2%</span>
+</div>
+<div class="h-1.5 w-full bg-blue-100 rounded-full overflow-hidden">
+<div class="h-full bg-blue-600 w-[64.2%] transition-all duration-1000"></div>
+</div>
+</div>
+</div>
+<!-- Quick Access Grid -->
+<div class="grid grid-cols-4 gap-4 h-32">
+<div class="bg-white border border-[#DDE3EE] rounded p-3 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-slate-400 text-lg" data-icon="image">image</span>
+<span class="text-[9px] font-['Geist_Mono'] text-slate-400">12.4 MB</span>
+</div>
+<p class="text-[10px] font-['Geist_Mono'] text-slate-600 truncate">IMG_NORTH_ZONE_01.RAW</p>
+</div>
+<div class="bg-white border border-[#DDE3EE] rounded p-3 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-slate-400 text-lg" data-icon="image">image</span>
+<span class="text-[9px] font-['Geist_Mono'] text-slate-400">8.1 MB</span>
+</div>
+<p class="text-[10px] font-['Geist_Mono'] text-slate-600 truncate">IMG_NORTH_ZONE_02.RAW</p>
+</div>
+<div class="bg-white border border-[#DDE3EE] rounded p-3 flex flex-col justify-between border-dashed border-slate-300">
+<div class="flex items-center justify-center h-full text-slate-400 hover:text-blue-500 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+</div>
+</div>
+<div class="bg-white border border-[#DDE3EE] rounded p-3 flex flex-col justify-between border-dashed border-slate-300">
+<div class="flex items-center justify-center h-full text-slate-400">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Extracted Metadata (320px) -->
+<section class="w-[320px] bg-white p-6 flex flex-col gap-6 shadow-[-4px_0_12px_rgba(0,0,0,0.02)] relative z-10">
+<div>
+<h3 class="font-['Sora'] font-bold text-xs uppercase tracking-widest text-slate-400 mb-4">Extracted Metadata</h3>
+<div class="space-y-4 font-['Geist_Mono'] text-xs">
+<!-- Status Item -->
+<div class="p-3 bg-slate-50 border border-slate-100 rounded-sm">
+<p class="text-slate-400 mb-1 text-[10px] uppercase">COORDINATE_FIX</p>
+<div class="flex justify-between items-center">
+<span class="text-slate-900 font-bold">40.7128° N, 74.0060° W</span>
+<span class="material-symbols-outlined text-emerald-500 text-base" data-icon="location_on">location_on</span>
+</div>
+</div>
+<!-- Intelligence Scoring -->
+<div class="p-3 bg-slate-50 border border-slate-100 rounded-sm">
+<p class="text-slate-400 mb-1 text-[10px] uppercase">AI Confidence Score</p>
+<div class="flex items-center gap-3">
+<div class="flex-grow h-1.5 bg-slate-200 rounded-full">
+<div class="h-full bg-emerald-500 w-[94.2%]"></div>
+</div>
+<span class="text-emerald-600 font-bold">94.2%</span>
+</div>
+</div>
+<!-- Detections -->
+<div class="p-3 bg-slate-50 border border-slate-100 rounded-sm">
+<p class="text-slate-400 mb-1 text-[10px] uppercase">Detected Assets</p>
+<div class="space-y-2 mt-2">
+<div class="flex justify-between text-blue-600">
+<span>Unit-7</span>
+<span>[FRIENDLY]</span>
+</div>
+<div class="flex justify-between text-red-600">
+<span>Hazard-Alpha</span>
+<span>[UNIDENTIFIED]</span>
+</div>
+</div>
+</div>
+<!-- Source Intelligence -->
+<div class="p-3 bg-slate-50 border border-slate-100 rounded-sm">
+<p class="text-slate-400 mb-1 text-[10px] uppercase">Source &amp; Timing</p>
+<div class="space-y-1 mt-1 text-slate-700">
+<div class="flex justify-between">
+<span class="text-slate-400">Provider:</span>
+<span>Satellite-B4</span>
+</div>
+<div class="flex justify-between">
+<span class="text-slate-400">Timestamp:</span>
+<span class="text-blue-500">UTC-04:22:11</span>
+</div>
+<div class="flex justify-between">
+<span class="text-slate-400">Sensor:</span>
+<span>Multi-Spectral</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Mini Map Preview -->
+<div class="flex-grow mt-2">
+<div class="h-full w-full bg-slate-200 rounded-sm overflow-hidden relative border border-slate-200">
+<img alt="Mission Location Map" data-alt="a detailed top-down tactical satellite map view with grid lines and neon blue military icons marking locations" data-location="New York" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFcfCaVGsX6cvaTIqxJJ0IrgxPniIR6C1hJuA9iqhmhCjQ99am3v01QsVGYQJo3bj8PJz0DmmY2Q9MaSizku06Z3NYg6vthdZzOMEAa1K1YSDIJFWNd2hSXITGn3c1Tj6A8hjXIaQyPNvg6mHzu5PpRVDjC_tAes0E0j1kNLRI904SRu-T84Wj2XKhBM7GvI5ZDX7U1O3cZsxnVqHgpnAaxTdTUlZtPVI7pZ6frnxoGVMb4wwTaN2FWShR-nAptMpDagKD7mzFcv8"/>
+<div class="absolute inset-0 bg-blue-500/10 pointer-events-none"></div>
+<div class="absolute top-2 right-2 flex gap-1">
+<button class="w-6 h-6 bg-white shadow-sm flex items-center justify-center text-slate-600 rounded">
+<span class="material-symbols-outlined text-xs" data-icon="add">add</span>
+</button>
+<button class="w-6 h-6 bg-white shadow-sm flex items-center justify-center text-slate-600 rounded">
+<span class="material-symbols-outlined text-xs" data-icon="remove">remove</span>
+</button>
+</div>
+</div>
+</div>
+<button class="w-full border border-[#DDE3EE] text-slate-700 py-3 rounded-sm font-['Sora'] font-semibold text-xs tracking-widest uppercase hover:bg-slate-50 transition-colors">
+                Export_Terminal_Log
+            </button>
+</section>
+</main>
+<!-- Floating Command Bar -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[640px] h-16 frosted-glass border border-white/40 shadow-lg rounded-full flex items-center px-6 gap-4 z-[100]">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+<span class="font-['Geist_Mono'] text-xs font-bold text-slate-900">_VISION REPORT READY</span>
+</div>
+<div class="h-6 w-[1px] bg-slate-300"></div>
+<div class="flex-grow">
+<span class="font-['Geist_Mono'] text-xs text-slate-500">Awaiting machine-level command...</span>
+</div>
+<button class="bg-primary text-white px-6 h-10 rounded-full font-['Sora'] font-bold text-[10px] tracking-widest uppercase hover:opacity-90 transition-opacity">
+            DEPLOY_DATA
+        </button>
+</div>
+</body></html>
