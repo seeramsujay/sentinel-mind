@@ -14,7 +14,7 @@ Before anyone codes, the team must finalize the JSON Schema and state pipeline. 
 * **April 22 (Day 1):** Provision the GCP project. **[UPGRADE]** Configure **Google Cloud Secret Manager** to distribute all API keys securely. Write the "Watcher" Python daemon to listen to the `/emergencies` collection.
 * **April 23 (Day 2):** Scaffold the Vertex AI Agent Builder logic. Program it to query strictly for `status == "conflict"` and autonomously resolve resource overlaps.
 * **April 24 (Day 3):** Finalize conflict logic and write the state-update script to flip documents back to `dispatched`.
-* **April 25 (Day 4):** **[UPGRADE]** Implement the Fairness Check via Vertex AI Model Monitoring. **[UPGRADE]** Implement the **Human-in-the-Loop (HITL) Override**—if the AI flags a dispatch for high bias, change the status to `awaiting_human_approval`. Code Freeze.
+* **April 25 (Day 4):** **[UPGRADE]** Implement the Fairness Check via Vertex AI Model Monitoring. **[UPGRADE]** Implement the **Human-in-the-Loop (HITL) Override**—if the AI flags a dispatch for high bias, change the status to `awaiting_human_approval`. **[DONE]** `audit.py` — `log_hitl_flag()` + `approve_dispatch()` + HITL daemon. Code Freeze.
 * **April 26 (Day 5):** **The Splice (Integration).** Turn on your Watcher daemon. 
 * **April 27 (Day 6):** Debug race conditions. Fix any database locking errors between your Orchestrator and Role 3's routing script. 
 
@@ -23,7 +23,7 @@ Before anyone codes, the team must finalize the JSON Schema and state pipeline. 
 ### Role 2: Triage Ingestion Lead (The Filter & Actuator)
 * **April 22 (Day 1):** Write the feedparser script to pull live RSS alerts. Connect it to Gemini 1.5 Flash using `response_schema` to force perfect JSON outputs.
 * **April 23 (Day 2):** Hook your script to Firestore. Push the JSON into `/emergencies` as `status: "triaged"`.
-* **April 24 (Day 3):** **[UPGRADE] Build the Discord Actuator.** Write the daemon that listens to Firestore. When an emergency flips to `status: "dispatched"`, send an automated Discord message to prove the AI has real-world agency.
+* **April 24 (Day 3):** **[UPGRADE] Build the Discord Actuator.** Write the daemon that listens to Firestore. When an emergency flips to `status: "dispatched"`, send an automated Discord embed to prove the AI has real-world agency.
 * **April 25 (Day 4):** Code Freeze. Build a "Mock Data Spammer" script that injects 50 fake emergencies into Firestore to stress-test the system. Harden against rate limits. 
 * **April 26 (Day 5):** **The Splice (Integration).** Turn on the firehose. Run your mock spammer so Roles 1, 3, and 4 have data to process.
 * **April 27 (Day 6):** Fix any JSON parsing errors or database write limits found during stress testing.
@@ -53,6 +53,6 @@ Before anyone codes, the team must finalize the JSON Schema and state pipeline. 
 ### All Hands: April 28 (Submission Evening)
 Dev work is strictly forbidden today.
 1. **The Golden Path:** Run a perfectly executed crisis simulation on the live app.
-2. **Record the Demo:** Do not edit fancy transitions. Show the mobile UI, show the Discord ping hitting the alert channel, click the "HITL Override" button, and highlight the SDG live trackers. Let the complex async code speak for itself.
+2. **Record the Demo:** Do not edit fancy transitions. Show the mobile UI, show the Discord embed ping hitting the alert channel, click the "HITL Override" button, and highlight the SDG live trackers. Let the complex async code speak for itself.
 3. **Clean the Repo:** Clean up the GitHub README, ensure no `.env` files or API keys are public, and attach your architecture diagram.
 4. **Submit:** Hit submit on the portal.

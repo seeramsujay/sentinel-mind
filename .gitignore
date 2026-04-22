@@ -15,10 +15,18 @@ __pycache__/
 .venv
 venv/
 ENV/
+*.log
+
+# Environment — DO NOT COMMIT these files
 .env
 .env.local
 .env.*.local
-*.log
+.env.template
+.env_secrets
+
+# Webhook / API secrets — DO NOT COMMIT
+*webhook*
+secrets.py
 
 # Firebase
 .firebase/
@@ -35,5 +43,6 @@ secrets.py
 # OS
 .DS_Store
 Thumbs.db
-Archives/
+
+# Agent artifacts
 .agent/

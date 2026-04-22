@@ -15,7 +15,6 @@ Here are the completely updated technical stack markdown files, integrating the 
 * **Monitoring & Governance:** Vertex AI Model Monitoring.
 * **Core APIs (Admin):** Gemini APIs, Google Maps Routes API, Firestore API.
 * **Language:** Python.
-* **[DONE] Actuation:** Discord Webhook API (dual-channel: general + P1).
 
 ## 2. Technical Documentation & Responsibilities
 

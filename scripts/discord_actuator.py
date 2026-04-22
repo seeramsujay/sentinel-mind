@@ -4,6 +4,7 @@ Listens to Firestore /emergencies collection. When an emergency flips to
 status == "dispatched", sends an alert to Discord via webhook.
 """
 
+import json
 import os
 import time
 import firebase_admin
@@ -28,46 +29,97 @@ def init_firestore():
     return firestore.client()
 
 
+def _str(val, default: str = "N/A") -> str:
+    if val is None:
+        return default
+    return str(val)
+
+
+def _float(val, default: float = 0.0) -> float:
+    if val is None:
+        return default
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return default
+
+
+def _int(val, default: int = 0) -> int:
+    if val is None:
+        return default
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return default
+
+
 def load_alerted() -> set:
     try:
         with open(ALERTED_LOG) as f:
             return set(json.load(f))
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError, PermissionError):
         return set()
 
 
 def save_alerted(alerted: set):
-    import json
-    with open(ALERTED_LOG, "w") as f:
-        json.dump(list(alerted), f)
+    try:
+        with open(ALERTED_LOG, "w") as f:
+            json.dump(list(alerted), f)
+    except OSError as e:
+        print(f"[DiscordActuator] Failed to persist alerted log: {e}")
 
 
 def urgency_color(urgency: str) -> int:
     mapping = {"P1": COLOR_RED, "P2": COLOR_ORANGE, "P3": COLOR_YELLOW}
-    return mapping.get(urgency.upper(), COLOR_ORANGE)
+    return mapping.get(str(urgency).strip().upper(), COLOR_ORANGE)
+
+
+def is_p1(urgency: str) -> bool:
+    return str(urgency).strip().upper() == "P1"
+
+
+def _extract_location(doc: dict) -> tuple:
+    loc = doc.get("location") or {}
+    address = loc.get("address") if isinstance(loc, dict) else _str(doc.get("location_name"))
+    lat = _float(loc.get("lat") if isinstance(loc, dict) else doc.get("latitude"))
+    lon = _float(loc.get("lng") if isinstance(loc, dict) else doc.get("longitude"))
+    return address, lat, lon
+
+
+def _extract_resource(doc: dict) -> tuple:
+    ra = doc.get("resource_assignment") or {}
+    if isinstance(ra, dict):
+        unit_id = ra.get("unit_id") or doc.get("assigned_unit")
+        eta_raw = ra.get("eta") or doc.get("eta_minutes")
+        carbon = ra.get("carbon_saved") or doc.get("carbon_saved_kg")
+    else:
+        unit_id = doc.get("assigned_unit")
+        eta_raw = doc.get("eta_minutes")
+        carbon = doc.get("carbon_saved_kg")
+    return unit_id, eta_raw, carbon
 
 
 def build_embed(doc: dict, doc_id: str) -> dict:
-    import json
-    urgency = doc.get("urgency", "P2").upper()
+    urgency = _str(doc.get("urgency"), "P2").strip().upper()
     color = urgency_color(urgency)
+    hazard = _str(doc.get("hazard_type"), "Unknown")
 
-    location = doc.get("location_name", "Unknown location")
-    lat = doc.get("latitude", "N/A")
-    lon = doc.get("longitude", "N/A")
-    hazard = doc.get("hazard_type", "Unknown")
-    eta = doc.get("eta_minutes", "N/A")
-    assigned = doc.get("assigned_unit", "Unassigned")
-    carbon_saved = doc.get("carbon_saved_kg", 0)
+    location_name, lat, lon = _extract_location(doc)
+    unit_id, eta_raw, carbon = _extract_resource(doc)
 
-    title = f"\u26a0\ufe0f [{urgency}] {hazard} — {location}"
+    eta_display = _str(eta_raw)
+    eta_int = _int(eta_raw)
+    eta_suffix = " min" if eta_int > 0 else ""
+    eta_formatted = f"{eta_int}{eta_suffix}" if eta_int > 0 else "N/A"
+
+    title = f"\u26a0\ufe0f [{urgency}] {hazard} — {location_name}"
 
     desc = (
-        f"**Location:** {location} ({lat}, {lon})\n"
-        f"**Unit:** {assigned}\n"
-        f"**ETA:** {eta} min\n"
-        f"**CO\u2082 Saved:** {carbon_saved:.2f} kg\n"
-        f"**Doc ID:** `{doc_id}`"
+        f"**Location:** {location_name} ({lat}, {lon})\n"
+        f"**Unit:** {_str(unit_id, 'Unassigned')}\n"
+        f"**ETA:** {eta_formatted}\n"
+        f"**CO\u2082 Saved:** {_float(carbon):.2f} kg\n"
+        f"**Doc ID:** `{_str(doc_id)}`"
     )
 
     return {
@@ -82,20 +134,25 @@ def build_embed(doc: dict, doc_id: str) -> dict:
     }
 
 
-def send_discord_alert(embed_payload: dict, is_p1: bool = False):
-    url = os.getenv("DISCORD_ALERT_WEBHOOK_URL") if is_p1 else os.getenv("DISCORD_WEBHOOK_URL")
+def send_discord_alert(embed_payload: dict, is_p1_flag: bool = False) -> bool:
+    url = os.getenv("DISCORD_ALERT_WEBHOOK_URL") if is_p1_flag else os.getenv("DISCORD_WEBHOOK_URL")
     if not url:
         print("[DiscordActuator] No webhook URL set — skipping.")
-        return
+        return False
 
     try:
         resp = requests.post(url, json=embed_payload, headers={"Content-Type": "application/json"}, timeout=10)
         if resp.status_code in (200, 204):
-            print(f"[DiscordActuator] Sent to {'P1' if is_p1 else 'general'} channel.")
-        else:
-            print(f"[DiscordActuator] Failed: {resp.status_code} {resp.text}")
+            print(f"[DiscordActuator] Sent to {'P1' if is_p1_flag else 'general'} channel.")
+            return True
+        print(f"[DiscordActuator] Failed: {resp.status_code} {resp.text}")
+        return False
+    except requests.exceptions.Timeout:
+        print("[DiscordActuator] Request timed out.")
+        return False
     except Exception as e:
         print(f"[DiscordActuator] Error: {e}")
+        return False
 
 
 def main():
@@ -110,14 +167,15 @@ def main():
             col_ref = db.collection("emergencies")
             for doc in col_ref.stream():
                 doc_dict = doc.to_dict()
+                if doc_dict is None:
+                    continue
                 if doc_dict.get("status") != "dispatched":
                     continue
                 if doc.id in alerted:
                     continue
 
                 payload = build_embed(doc_dict, doc.id)
-                urgency = doc_dict.get("urgency", "P2")
-                send_discord_alert(payload, urgency.upper() == "P1")
+                send_discord_alert(payload, is_p1(doc_dict.get("urgency", "")))
                 alerted.add(doc.id)
 
             save_alerted(alerted)
