@@ -185,3 +185,4 @@ class LogisticsAgent:
 if __name__ == "__main__":
     agent = LogisticsAgent()
     asyncio.run(agent.run_swarm())
+ 
