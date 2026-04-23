@@ -2,6 +2,8 @@ from google.cloud import secretmanager
 from .auth import SentinelAuth
 
 class SentinelSecrets:
+    # Requires IAM permission: secretmanager.versions.access for the service account
+
     """Manages secure retrieval of API keys from Google Cloud Secret Manager."""
     
     _client = None

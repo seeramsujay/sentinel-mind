@@ -6,7 +6,7 @@ from vertexai.generative_models import GenerativeModel
 class ConflictResolver:
     def __init__(self):
         self._init_vertex()
-        self.model = GenerativeModel("gemini-1.5-pro")
+        self.model = GenerativeModel(os.getenv("VERTEX_MODEL_ID", "gemini-2.5-flash-lite"))
         self._system_prompt = """You are the SentinelMind Meta-Orchestrator.
 You must respond ONLY with valid JSON — no markdown, no explanation.
 Goal: 
