@@ -40,7 +40,7 @@ When a disaster strikes, every minute of delay costs lives. SentinelMind is a mu
 - **Cloud**: GCP (Vertex AI, Secret Manager, Cloud Run)
 - **Database**: Firebase Firestore (async state pipeline)
 - **Frontend**: React, Tailwind CSS, Firebase Hosting
-- **AI/ML**: Gemini 1.5 Flash (Triage), Gemini 1.5 Pro (RAG), Gemini 1.5 Pro Vision (Image)
+- **LLMs:** gemini-2.5-flash-lite (Multimodal context & high-speed triage)
 - **Logistics**: Google Maps Routes API
 - **Actuation**: Discord Webhook API (dual-channel: general + P1-only)
 

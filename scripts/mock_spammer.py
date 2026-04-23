@@ -71,6 +71,7 @@ EMERGENCY_SCHEMA = types.Schema(
         "hazard_type": types.Schema(
             type=types.Type.STRING,
             description=(
+                "Mock Incident: Simulation of a disaster event for Role 3 testing using gemini-2.5-flash-lite. "
                 "Category of disaster. One of: flood, earthquake, fire, "
                 "landslide, cyclone, medical, structural_collapse, chemical_spill, "
                 "drought, tsunami."
