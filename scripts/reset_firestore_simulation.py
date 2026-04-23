@@ -24,7 +24,7 @@ def reset_simulation_state():
     for doc in emergencies:
         # Reset to 'triaged' and clear Role 3 data
         doc.reference.update({
-            "status": "triaged",
+            "status": "awaiting_dispatch",
             "resource_assignment": firestore.DELETE_FIELD,
             "intelligence": firestore.DELETE_FIELD,
             "severity": firestore.DELETE_FIELD,

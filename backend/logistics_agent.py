@@ -20,6 +20,8 @@ class LogisticsAgent:
         self.db = SentinelAuth.get_firestore()
         self.routing = RoutingService()
         self.assessor = RiskAssessor()
+        self.semaphore = asyncio.Semaphore(5) # Throttled for Gemini quota
+        self.lock = asyncio.Lock() # Swarm Lock to prevent race conditions
         
         # Setup logging
         logging.basicConfig(
@@ -37,9 +39,9 @@ class LogisticsAgent:
                 self.auto_release_resources()
 
                 # 1. Query for 'awaiting_dispatch' emergencies
-                # Fetching snapshot to process current batch
                 docs = self.db.collection('emergencies')\
                     .where('status', '==', 'awaiting_dispatch')\
+                    .limit(50)\
                     .get()
 
                 if not docs:
@@ -48,7 +50,7 @@ class LogisticsAgent:
 
                 self.logger.info(f"Swarm detected {len(docs)} pending items. Scaling workers...")
                 
-                # 2. Process all docs in parallel using asyncio.gather
+                # 2. Process all docs in parallel with semaphore control
                 tasks = [self.process_emergency_async(doc) for doc in docs]
                 await asyncio.gather(*tasks)
 
@@ -59,85 +61,82 @@ class LogisticsAgent:
                 await asyncio.sleep(5)
 
     async def process_emergency_async(self, doc):
-        """Asynchronous worker for a single incident with Transactional Safety."""
-        try:
-            data = doc.to_dict()
-            emergency_id = doc.id
-            if data.get('role1_override') is True: return
+        """Asynchronous worker for a single incident with Swarm Lock."""
+        async with self.semaphore:
+            try:
+                data = doc.to_dict()
+                emergency_id = doc.id
+                if data.get('role1_override') is True: return
 
-            emergency_loc = data.get('location') or data.get('location_coordinates')
-            if not emergency_loc: return
+                emergency_loc = data.get('location') or data.get('location_coordinates')
+                if not emergency_loc: return
 
-            # Transactional Dispatch Logic
-            transaction = self.db.transaction()
-            result = await self._dispatch_transactional(transaction, doc.reference, data, emergency_loc)
-            
-            if result:
-                self.logger.info(f"TRANSACTION SUCCESS: {result} dispatched to {emergency_id}")
-            else:
-                self.logger.warning(f"TRANSACTION CONFLICT/FAILURE for {emergency_id}")
+                # 1. Atomic Resource Capture (Inside Lock)
+                async with self.lock:
+                    # Check if already processed by another worker
+                    fresh_doc = doc.reference.get()
+                    if fresh_doc.get('status') != 'awaiting_dispatch':
+                        return
 
-        except Exception as e:
-            self.logger.error(f"Worker Error for {doc.id}: {e}")
+                    agency_id = data.get('agency_id')
+                    res_query = self.db.collection('resources').where('status', '==', 'available')
+                    if agency_id:
+                        res_query = res_query.where('agency_id', '==', agency_id)
+                    available_resources = res_query.get()
 
-    @firestore.transactional
-    def _dispatch_transactional(self, transaction, doc_ref, data, emergency_loc):
-        """Atomic block for resource selection and status updates."""
-        # 1. Get available resources with Agency Affinity
-        agency_id = data.get('agency_id')
-        res_query = self.db.collection('resources').where('status', '==', 'available')
-        if agency_id:
-            res_query = res_query.where('agency_id', '==', agency_id)
-        
-        available_resources = list(res_query.get(transaction=transaction))
+                    if not available_resources:
+                        doc.reference.update({
+                            "status": "awaiting_resource",
+                            "escalated": True,
+                            "escalation_note": "No resources available."
+                        })
+                        return
 
-        if not available_resources:
-            doc_ref.update({
-                "status": "awaiting_resource",
-                "escalated": True,
-                "escalation_note": "Resource depletion (atomic check)."
-            }, transaction=transaction)
-            return None
+                    best_resource = ResourceAllocator.find_best_resource(emergency_loc, available_resources)
+                    if not best_resource: return
 
-        # 2. Find best resource
-        best_resource = ResourceAllocator.find_best_resource(emergency_loc, available_resources)
-        if not best_resource: return None
+                    res_data = best_resource.to_dict()
+                    res_ref = best_resource.reference
+                    
+                    # Instantly mark as busy to prevent double-assignment
+                    res_ref.update({
+                        "status": "busy",
+                        "assigned_to": emergency_id,
+                        "last_dispatched": firestore.SERVER_TIMESTAMP
+                    })
+                    
+                    # Mark emergency as 'dispatching'
+                    doc.reference.update({"status": "dispatching"})
 
-        res_data = best_resource.to_dict()
-        res_ref = best_resource.reference
-        unit_id = res_data.get('unit_id') or best_resource.id
+                # 2. Parallel Intelligence Tasks (OUTSIDE Lock)
+                route = self.routing.get_route_details(res_data.get('location'), emergency_loc)
+                risk = self.assessor.get_risk_assessment(data)
+                automl = self.assessor.get_automl_prediction(data)
+                rag_context = VectorSearchClient.get_historical_context(f"{data.get('hazard_type')} response")
+                sitrep = self.generate_sitrep(data, risk, route, rag_context)
 
-        # 3. Intelligence (Heavy tasks outside transaction if possible, but for simplicity here)
-        route = self.routing.get_route_details(res_data.get('location'), emergency_loc)
-        risk = self.assessor.get_risk_assessment(data)
-        automl = self.assessor.get_automl_prediction(data)
-        rag_context = VectorSearchClient.get_historical_context(f"{data.get('hazard_type')} response")
-        sitrep = self.generate_sitrep(data, risk, route, rag_context)
+                # 3. Final Dispatch Commit
+                doc.reference.update({
+                    "status": "dispatched",
+                    "severity": data.get('severity') or max(1, min(5, int(risk.get('risk_score', 50) / 20))),
+                    "resource_assignment": {
+                        "unit_id": res_data.get('unit_id'),
+                        "resource_type": res_data.get('resource_type', 'Default'),
+                        "polyline_route": route['polyline_route'],
+                        "eta": route['eta']
+                    },
+                    "intelligence": {
+                        "risk_assessment": risk.get('assessment'),
+                        "spread_probability": automl['spread_probability'],
+                        "situation_report": sitrep,
+                        "ndma_protocol": rag_context
+                    }
+                })
+                
+                self.logger.info(f"SUCCESS: Dispatched {res_data['unit_id']} to {emergency_id}")
 
-        # 4. Atomic Updates
-        transaction.update(res_ref, {
-            "status": "busy",
-            "assigned_to": doc_ref.id,
-            "last_dispatched": firestore.SERVER_TIMESTAMP
-        })
-
-        transaction.update(doc_ref, {
-            "status": "dispatched",
-            "severity": data.get('severity') or max(1, min(5, int(risk.get('risk_score', 50) / 20))),
-            "resource_assignment": {
-                "unit_id": unit_id,
-                "resource_type": res_data.get('resource_type', 'Default'),
-                "polyline_route": route['polyline_route'],
-                "eta": route['eta']
-            },
-            "intelligence": {
-                "risk_assessment": risk.get('assessment'),
-                "spread_probability": automl['spread_probability'],
-                "situation_report": sitrep,
-                "ndma_protocol": rag_context
-            }
-        })
-        return unit_id
+            except Exception as e:
+                self.logger.error(f"Worker Error for {doc.id}: {e}")
 
     def generate_sitrep(self, data, risk_data, route_details, rag_context):
         """Drafts a professional Situation Report (SitRep) using Gemini + RAG."""
