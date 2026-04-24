@@ -8,6 +8,9 @@ from orchestrator.auth import SentinelAuth
 
 class IngestionService:
     def __init__(self):
+        if not os.getenv("GEMINI_API_KEY"):
+            raise EnvironmentError("GEMINI_API_KEY is not set. Ingestion Service requires this for Triage AI.")
+            
         self.db = SentinelAuth.get_firestore()
         SentinelAuth.init_vertex()
         self.model = GenerativeModel("gemini-2.5-flash-lite")
@@ -44,7 +47,7 @@ class IngestionService:
         Task: Convert unstructured disaster alert into a structured JSON emergency report.
         
         Alert Title: {entry.title}
-        Alert Description: {getattr(entry, 'description', entry.summary)}
+        Alert Description: {getattr(entry, 'description', getattr(entry, 'summary', 'No description available'))}
         
         Output Requirements (JSON):
         1. hazard_type (Flood, Earthquake, Fire, Cyclone, etc.)

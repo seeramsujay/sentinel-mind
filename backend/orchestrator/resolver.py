@@ -1,11 +1,12 @@
 import json
 import os
 from vertexai.generative_models import GenerativeModel
+from .auth import SentinelAuth
 
 
 class ConflictResolver:
     def __init__(self):
-        self._init_vertex()
+        SentinelAuth.init_vertex()
         self.model = GenerativeModel(os.getenv("VERTEX_MODEL_ID", "gemini-2.5-flash-lite"))
         self._system_prompt = """You are the SentinelMind Meta-Orchestrator.
 You must respond ONLY with valid JSON — no markdown, no explanation.
@@ -35,14 +36,6 @@ Return JSON format:
 Rules: Prioritize P1 over P2 over P3. Assign nearest available unit.
 If no unit is available for a P1, set action to "wait"."""
 
-    def _init_vertex(self):
-        try:
-            import vertexai
-            project = os.getenv("GCP_PROJECT_ID", "sentinelmind")
-            location = os.getenv("GCP_REGION", "us-central1")
-            vertexai.init(project=project, location=location)
-        except Exception as e:
-            print(f"[ConflictResolver] Vertex AI init error: {e}")
 
     def resolve(self, conflicts, resources) -> dict | None:
         if not conflicts or not resources:

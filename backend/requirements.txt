@@ -17,6 +17,3 @@ python-dotenv
 # Utils
 pydantic
 asyncio
-
-# Actuation
-requests

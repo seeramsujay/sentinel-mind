@@ -17,11 +17,13 @@ class LogisticsAgent:
     """
     
     def __init__(self):
+        if not os.getenv("GEMINI_API_KEY"):
+            raise EnvironmentError("GEMINI_API_KEY is not set. Logistics Agent requires this for Risk Assessment.")
+            
         self.db = SentinelAuth.get_firestore()
         self.routing = RoutingService()
         self.assessor = RiskAssessor()
         self.semaphore = asyncio.Semaphore(5) # Throttled for Gemini quota
-        self.lock = asyncio.Lock() # Swarm Lock to prevent race conditions
         
         # Setup logging
         logging.basicConfig(
@@ -61,9 +63,10 @@ class LogisticsAgent:
                 await asyncio.sleep(5)
 
     async def process_emergency_async(self, doc):
-        """Asynchronous worker for a single incident with Swarm Lock."""
+        """Asynchronous worker for a single incident with Distributed Firestore Transaction."""
         async with self.semaphore:
             try:
+                emergency_ref = doc.reference
                 data = doc.to_dict()
                 emergency_id = doc.id
                 if data.get('role1_override') is True: return
@@ -71,44 +74,60 @@ class LogisticsAgent:
                 emergency_loc = data.get('location') or data.get('location_coordinates')
                 if not emergency_loc: return
 
-                # 1. Atomic Resource Capture (Inside Lock)
-                async with self.lock:
-                    # Check if already processed by another worker
-                    fresh_doc = doc.reference.get()
-                    if fresh_doc.get('status') != 'awaiting_dispatch':
-                        return
+                # Transactional Resource Acquisition
+                transaction = self.db.transaction()
+                
+                @firestore.transactional
+                def atomic_dispatch(transaction, emergency_ref, data):
+                    # 1. Fresh check of status
+                    snapshot = emergency_ref.get(transaction=transaction)
+                    if snapshot.get('status') != 'awaiting_dispatch':
+                        return None, "Already processed"
 
+                    # 2. Get available resources
                     agency_id = data.get('agency_id')
                     res_query = self.db.collection('resources').where('status', '==', 'available')
                     if agency_id:
                         res_query = res_query.where('agency_id', '==', agency_id)
-                    available_resources = res_query.get()
+                    
+                    available_resources = res_query.get(transaction=transaction)
 
                     if not available_resources:
-                        doc.reference.update({
+                        transaction.update(emergency_ref, {
                             "status": "awaiting_resource",
                             "escalated": True,
-                            "escalation_note": "No resources available."
+                            "escalation_note": "No resources available at this time."
                         })
-                        return
+                        return None, "No resources"
 
+                    # 3. Find best match
                     best_resource = ResourceAllocator.find_best_resource(emergency_loc, available_resources)
-                    if not best_resource: return
+                    if not best_resource:
+                        transaction.update(emergency_ref, {
+                            "status": "awaiting_resource",
+                            "escalated": True,
+                            "escalation_note": "Available resources do not match deployment criteria."
+                        })
+                        return None, "No match found"
 
-                    res_data = best_resource.to_dict()
+                    # 4. Atomic Commit
                     res_ref = best_resource.reference
-                    
-                    # Instantly mark as busy to prevent double-assignment
-                    res_ref.update({
+                    transaction.update(res_ref, {
                         "status": "busy",
                         "assigned_to": emergency_id,
                         "last_dispatched": firestore.SERVER_TIMESTAMP
                     })
-                    
-                    # Mark emergency as 'dispatching'
-                    doc.reference.update({"status": "dispatching"})
+                    transaction.update(emergency_ref, {"status": "dispatching"})
+                    return best_resource.to_dict(), "Success"
 
-                # 2. Parallel Intelligence Tasks (OUTSIDE Lock)
+                res_data, result_msg = atomic_dispatch(transaction, emergency_ref, data)
+                
+                if not res_data:
+                    if result_msg != "Already processed":
+                        self.logger.warning(f"Dispatch aborted for {emergency_id}: {result_msg}")
+                    return
+
+                # 2. Parallel Intelligence Tasks (OUTSIDE Transaction/Lock)
                 route = self.routing.get_route_details(res_data.get('location'), emergency_loc)
                 risk = self.assessor.get_risk_assessment(data)
                 automl = self.assessor.get_automl_prediction(data)

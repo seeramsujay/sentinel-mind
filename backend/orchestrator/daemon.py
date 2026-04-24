@@ -113,7 +113,7 @@ class OrchestratorDaemon:
             if is_hitl:
                 GovernanceAudit.log_hitl_flag(doc_id, d.get("hitl_reasoning", "Bias risk detected."), db)
             else:
-            print(f"[Orchestrator] RESOLVED {doc_id} → {action}")
+                print(f"[Orchestrator] RESOLVED {doc_id} → {d.get('action')}")
 
 
 if __name__ == "__main__":
