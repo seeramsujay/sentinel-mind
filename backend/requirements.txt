@@ -17,3 +17,5 @@ python-dotenv
 # Utils
 pydantic
 asyncio
+fastapi
+uvicorn

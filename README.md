@@ -2,6 +2,9 @@
 
 > Shrink the emergency response window from hours to seconds — autonomously.
 
+## Live Deployment
+**Cloud Run URL:** [https://sentinelmind-backend-suj6h7uvga-uc.a.run.app](https://sentinelmind-backend-suj6h7uvga-uc.a.run.app)
+
 ## Mission
 
 When a disaster strikes, every minute of delay costs lives. SentinelMind is a multi-agent AI pipeline that polls live disaster feeds, triages alerts via Gemini, routes emergency vehicles through Google Maps, resolves conflicts via Vertex AI, and dispatches real-world alerts — all asynchronously through Firestore.
@@ -66,10 +69,12 @@ cp .env.template .env
 # 3. Seed mock resources
 python scripts/seed_firestore.py
 
-# 4. Start daemons (each in its own terminal)
-python backend/orchestrator/daemon.py          # Role 1 — conflict watcher
-python scripts/discord_actuator.py            # Role 2 — Discord dispatch
-python scripts/routing_daemon.py             # Role 3 — vehicle routing
+# 4. Start Backend Daemons (Unified Threading)
+uvicorn main:app --host 0.0.0.0 --port 8080
+
+# OR via Docker for Cloud Run testing
+docker build -t sentinel-backend .
+docker run -p 8080:8080 sentinel-backend
 
 # 5. Start frontend
 cd frontend && npm install && npm run dev
