@@ -5,13 +5,28 @@ const FieldUpload = () => {
     const [progress, setProgress] = useState(64);
     const [isDeploying, setIsDeploying] = useState(false);
     const [statusText, setStatusText] = useState("Awaiting cloud deployment orchestration...");
+    const [previewUrl, setPreviewUrl] = useState("https://lh3.googleusercontent.com/aida-public/AB6AXuDFcfCaVGsX6cvaTIqxJJ0IrgxPniIR6C1hJuA9iqhmhCjQ99am3v01QsVGYQJo3bj8PJz0DmmY2Q9MaSizku06Z3NYg6vthdZzOMEAa1K1YSDIJFWNd2hSXITGn3c1Tj6A8hjXIaQyPNvg6mHzu5PpRVDjC_tAes0E0j1kNLRI904SRu-T84Wj2XKhBM7GvI5ZDX7U1O3cZsxnVqHgpnAaxTdTUlZtPVI7pZ6frnxoGVMb4wwTaN2FWShR-nAptMpDagKD7mzFcv8");
+
+    const onFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result);
+                setProgress(0);
+                setStatusText(`IMAGE_SOURCE: ${file.name} CACHED`);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleDeploy = () => {
+        if (isDeploying) return;
         setIsDeploying(true);
         setStatusText("INITIATING CLOUD HANDSHAKE...");
         let current = 0;
         const interval = setInterval(() => {
-            current += Math.floor(Math.random() * 15);
+            current += Math.floor(random(5, 15));
             if (current >= 100) {
                 current = 100;
                 clearInterval(interval);
@@ -22,6 +37,8 @@ const FieldUpload = () => {
             setProgress(current);
         }, 300);
     };
+
+    const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 
     const handleExport = () => {
         const logContent = `SENTINEL_MIND SYSTEM LOG - ${new Date().toISOString()}\n\nSource: Field Operator Unit-7\nSymmetry Key: AEGIS-SEC-01\n\n[INFO] Data Packet IMG_ZONE_NORTH_01.RAW cached.\n[INFO] AI Confidence: 94.2%\n[WARN] High thermal variance in sector 4.\n[INFO] Deployment readiness: 100%\n\n--- END LOG ---`;
@@ -40,6 +57,13 @@ const FieldUpload = () => {
     return (
         <div className="bg-[#EEF2F7] font-body-medium text-slate-800 h-screen overflow-hidden flex flex-col pt-14">
             <Header />
+            <input 
+                type="file" 
+                id="field-image-input" 
+                className="hidden" 
+                accept="image/*" 
+                onChange={onFileSelect}
+            />
 
             {/* Main Content Area */}
             <main className="flex-1 flex overflow-hidden">
@@ -61,7 +85,7 @@ const FieldUpload = () => {
                     </div>
 
                     {/* Large Upload Area */}
-                    <div onClick={() => alert('Explorer: Select raw vision telemetry files...')} className="flex-1 bg-white border border-[#DDE3EE] rounded-lg shadow-sm relative overflow-hidden flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-blue-400 hex-background">
+                    <div onClick={() => document.getElementById('field-image-input').click()} className="flex-1 bg-white border border-[#DDE3EE] rounded-lg shadow-sm relative overflow-hidden flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-blue-400 hex-background">
                         {/* Scanning Line Animation */}
                         <div className="scan"></div>
                         
