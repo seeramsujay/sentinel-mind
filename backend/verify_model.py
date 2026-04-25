@@ -1,6 +1,6 @@
 import os
 from vertexai.generative_models import GenerativeModel
-from orchestrator.auth import SentinelAuth
+from backend.orchestrator.auth import SentinelAuth
 
 def verify_model():
     SentinelAuth.init_vertex()

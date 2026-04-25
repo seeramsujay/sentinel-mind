@@ -1,0 +1,243 @@
+import React, { useState } from 'react';
+import Header from '../components/Header';
+
+const AssetTree = () => {
+    const [selectedAsset, setSelectedAsset] = useState({
+        id: 'SAT-8830-XL',
+        name: 'AEGIS-02 THERMAL IMAGING',
+        type: 'ORBITAL',
+        status: 'ONLINE',
+        connectivity: '99.8%',
+        telemetry: {
+            speed: '7.67 km/s',
+            altitude: '542.1 km',
+            battery: '84.2%',
+            temp: '14.2°C'
+        }
+    });
+
+    const [expanded, setExpanded] = useState({
+        orbital: true,
+        ground: true,
+        field: true
+    });
+
+    const [command, setCommand] = useState('');
+
+    const toggle = (section) => {
+        setExpanded(prev => ({ ...prev, [section]: !prev[section] }));
+    };
+
+    const handleCommand = (e) => {
+        if (e.key === 'Enter') {
+            alert(`Orchestration Command Issued: ${command}\n\nStatus: Scanning selected asset ${selectedAsset.id}...`);
+            setCommand('');
+        }
+    };
+
+    const assets = {
+        orbital: [
+            { id: 'SAT-8829-XL', name: 'AEGIS-01 HIGH RESOLUTION', status: 'ONLINE', speed: '7.52 km/s', altitude: '540.2 km', battery: '92.1%', temp: '12.4°C' },
+            { id: 'SAT-8830-XL', name: 'AEGIS-02 THERMAL IMAGING', status: 'ONLINE', speed: '7.67 km/s', altitude: '542.1 km', battery: '84.2%', temp: '14.2°C' },
+            { id: 'SAT-8831-XL', name: 'AEGIS-03 LWS', status: 'MAINTENANCE', speed: '---', altitude: '538.9 km', battery: '45.0%', temp: '18.1°C' }
+        ],
+        ground: [
+            { id: 'GSH-441-A', name: 'NORAD-HUB-01', status: 'ONLINE', type: 'GROUND' },
+            { id: 'GSH-444-F', name: 'OSLO-HUB-04', status: 'OFFLINE', type: 'GROUND' }
+        ]
+    };
+
+    const navigateToUpload = () => {
+        window.location.href = "/upload";
+    };
+
+    return (
+        <div className="bg-[#EEF2F7] font-body-prose text-on-surface h-screen flex flex-col pt-14">
+            <Header />
+
+            <main className="flex flex-1 overflow-hidden">
+                {/* Center Column: Asset Tree Explorer */}
+                <div className="flex-1 flex flex-col bg-white border-r border-slate-200 relative z-40">
+                    <div className="p-6 border-b border-slate-200 bg-slate-50 flex items-center gap-4">
+                        <div className="relative flex-1">
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                            <input 
+                                onKeyDown={(e) => e.key === 'Enter' && alert(`Deep-search initiated for asset: ${e.target.value}`)}
+                                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded bg-white text-slate-800 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" 
+                                placeholder="Search Asset ID, Type, or Fleet..." 
+                                type="text"
+                            />
+                        </div>
+                        <button onClick={() => alert('Asset filtering logic engaged: All Sectors')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer">
+                            <span className="material-symbols-outlined text-[18px]">filter_list</span>
+                            FILTERS
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                        <div className="space-y-1">
+                            <div onClick={() => toggle('orbital')} className="flex items-center gap-2 py-2 group cursor-pointer hover:bg-slate-100 px-2 rounded active:scale-[0.98] transition-transform">
+                                <span className={`material-symbols-outlined text-slate-400 transition-transform duration-200 ${expanded.orbital ? 'rotate-0' : '-rotate-90'}`}>keyboard_arrow_down</span>
+                                <span className="material-symbols-outlined text-blue-600">public</span>
+                                <span className="font-bold text-[15px]">Orbital Fleet [O-NET]</span>
+                                <span className="ml-auto font-mono text-[11px] text-slate-500">4/4 ACTIVE</span>
+                            </div>
+                            {expanded.orbital && assets.orbital.map(asset => (
+                                <div 
+                                    key={asset.id}
+                                    onClick={() => setSelectedAsset({
+                                        id: asset.id,
+                                        name: asset.name,
+                                        status: asset.status,
+                                        connectivity: asset.status === 'ONLINE' ? '99.8%' : '0.0%',
+                                        telemetry: {
+                                            speed: asset.speed,
+                                            altitude: asset.altitude,
+                                            battery: asset.battery,
+                                            temp: asset.temp
+                                        }
+                                    })}
+                                    className={`ml-8 flex items-center gap-3 py-2 px-4 hover:bg-slate-50 rounded border-l-2 cursor-pointer transition-all ${selectedAsset.id === asset.id ? 'bg-blue-50 border-blue-600' : 'border-transparent hover:border-blue-600'}`}
+                                >
+                                    <div className={`w-2 h-2 rounded-full ${asset.status === 'ONLINE' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500'}`}></div>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-[12px] text-slate-800">{asset.name}</span>
+                                        <span className="font-mono text-slate-500 text-[11px]">ID: {asset.id} | {asset.status}</span>
+                                    </div>
+                                    {asset.id === selectedAsset.id && (
+                                        <span className="ml-auto material-symbols-outlined text-[18px] text-blue-600">radio_button_checked</span>
+                                    )}
+                                </div>
+                            ))}
+
+                            <div onClick={() => toggle('ground')} className="flex items-center gap-2 py-4 group cursor-pointer hover:bg-slate-100 px-2 rounded mt-4 active:scale-[0.98] transition-transform">
+                                <span className={`material-symbols-outlined text-slate-400 transition-transform duration-200 ${expanded.ground ? 'rotate-0' : '-rotate-90'}`}>keyboard_arrow_down</span>
+                                <span className="material-symbols-outlined text-blue-600">cell_tower</span>
+                                <span className="font-bold text-[15px]">Ground Stations [G-BASE]</span>
+                            </div>
+                            {expanded.ground && assets.ground.map(asset => (
+                                <div 
+                                    key={asset.id}
+                                    onClick={() => setSelectedAsset({
+                                        id: asset.id,
+                                        name: asset.name,
+                                        status: asset.status,
+                                        connectivity: asset.status === 'ONLINE' ? '100%' : 'OFFLINE',
+                                        telemetry: { speed: 'N/A', altitude: 'SEA LEVEL', battery: 'STATION POWER', temp: '22.0°C' }
+                                    })}
+                                    className={`ml-8 flex items-center gap-3 py-2 px-4 hover:bg-slate-50 rounded border-l-2 cursor-pointer transition-all ${selectedAsset.id === asset.id ? 'bg-blue-50 border-blue-600' : 'border-transparent'}`}
+                                >
+                                    <div className={`w-2 h-2 rounded-full ${asset.status === 'ONLINE' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500'}`}></div>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-[12px] text-slate-800">{asset.name}</span>
+                                        <span className="font-mono text-slate-500 text-[11px]">ID: {asset.id} | {asset.status}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Column: Detail Panel */}
+                <aside className="w-[380px] bg-white flex flex-col border-l border-slate-200 relative z-40">
+                    <div className="p-6 border-b border-slate-200 bg-slate-50">
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-xs font-bold text-blue-600 tracking-widest uppercase">Asset Profile</span>
+                            <button onClick={() => alert('Panel reset to default.')} className="material-symbols-outlined text-slate-400 hover:text-slate-800 cursor-pointer">close</button>
+                        </div>
+                        <h2 className="font-bold text-xl text-slate-800 uppercase tracking-tight line-clamp-1">{selectedAsset.name}</h2>
+                        <p className="font-mono text-sm text-slate-500">SYS_ID: {selectedAsset.id}</p>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                        <section className="p-6 border-b border-slate-200">
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className={`w-3 h-3 rounded-full animate-pulse ${selectedAsset.status === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
+                                <span className={`font-bold text-[12px] uppercase tracking-wider ${selectedAsset.status === 'ONLINE' ? 'text-emerald-700' : 'text-amber-700'}`}>
+                                    {selectedAsset.status}: {selectedAsset.connectivity}
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-3 bg-slate-50 rounded border border-slate-200">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Metric A</p>
+                                    <p className="font-mono text-lg text-slate-800">{selectedAsset.telemetry.speed}</p>
+                                </div>
+                                <div className="p-3 bg-slate-50 rounded border border-slate-200">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Metric B</p>
+                                    <p className="font-mono text-lg text-slate-800">{selectedAsset.telemetry.altitude}</p>
+                                </div>
+                                <div className="p-3 bg-slate-50 rounded border border-slate-200">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Energy</p>
+                                    <p className="font-mono text-lg text-slate-800">{selectedAsset.telemetry.battery}</p>
+                                </div>
+                                <div className="p-3 bg-slate-50 rounded border border-slate-200">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Stability</p>
+                                    <p className="font-mono text-lg text-slate-800 font-bold text-emerald-600">NOMINAL</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="p-6 border-b border-slate-200">
+                            <h3 className="font-bold text-xs text-slate-400 uppercase mb-4 tracking-widest">Geospatial Reference</h3>
+                            <div className="h-40 w-full bg-slate-100 rounded overflow-hidden relative border border-slate-200">
+                                <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
+                                    <span className="material-symbols-outlined text-[48px] text-slate-200">map</span>
+                                </div>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-4 h-4 bg-blue-600 rounded-full ring-4 ring-blue-600/20"></div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="p-6">
+                            <h3 className="font-bold text-xs text-slate-400 uppercase mb-4 tracking-widest">Active Protocols</h3>
+                            <div className="p-3 border border-blue-600/20 bg-blue-50/50 rounded flex items-start gap-3">
+                                <span className="material-symbols-outlined text-blue-600 text-[20px]">verified_user</span>
+                                <div>
+                                    <p className="font-bold text-[12px] text-slate-800 tracking-tight">Mission Readiness Level 4</p>
+                                    <p className="text-[11px] text-slate-500 mt-1">Resource is cleared for autonomous override and cross-sector dispatch.</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div className="p-4 bg-white border-t border-slate-200 grid grid-cols-2 gap-2">
+                        <button onClick={() => alert(`Diagnostics Summary for ${selectedAsset.id}:\n- Signal Integrity: 99.4%\n- Logic Gate Sync: OK\n- Thermal Drift: 0.02%`)} className="px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer active:scale-95 shadow-sm">DIAGNOSTICS</button>
+                        <button onClick={() => alert(`ATTENTION: Override signal sent to ${selectedAsset.id}. Manual control established over telemetry node ${selectedAsset.id.split('-')[1]}.`)} className="px-4 py-2 bg-blue-600 text-white rounded font-bold text-[12px] hover:bg-blue-700 transition-all cursor-pointer shadow-md active:scale-95">OVERRIDE</button>
+                    </div>
+                </aside>
+            </main>
+            
+            {/* Standardized Command Bar */}
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-5xl h-20 frosted border border-white/60 rounded-2xl shadow-2xl z-[100] flex items-center px-6 gap-6">
+                <button onClick={navigateToUpload} className="h-12 bg-primary text-white text-[12px] font-bold px-6 rounded-xl flex items-center gap-3 hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 whitespace-nowrap">
+                    <span className="material-symbols-outlined">cloud_upload</span>
+                    RESOURCE DEPLOY
+                </button>
+                <div className="flex-1 h-12 bg-white/40 border border-brand-border rounded-xl px-4 flex items-center overflow-hidden focus-within:ring-1 focus-within:ring-primary">
+                    <span className="font-data-mono text-primary mr-2">_</span>
+                    <input 
+                        value={command}
+                        onChange={(e) => setCommand(e.target.value)}
+                        onKeyDown={handleCommand}
+                        className="bg-transparent border-none outline-none w-full font-data-mono text-sm text-slate-800 placeholder-slate-400 uppercase tracking-wider" 
+                        placeholder="Issue asset orchestrator command..." 
+                        type="text"
+                    />
+                </div>
+                <div className="flex gap-4 border-l border-brand-border pl-6">
+                    <div className="text-right">
+                        <span className="block text-[18px] font-data-mono leading-none">0/4</span>
+                        <span className="block text-[8px] font-bold text-slate-500 tracking-wider">DEPLOYED</span>
+                    </div>
+                    <div className="text-right">
+                        <span className="block text-[18px] font-data-mono leading-none">100%</span>
+                        <span className="block text-[8px] font-bold text-slate-500 tracking-wider uppercase">HEALTH</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default AssetTree;

@@ -6,6 +6,7 @@ from vertexai.generative_models import GenerativeModel
 from google.cloud import aiplatform
 from .auth import SentinelAuth
 from .secrets_manager import SentinelSecrets
+import requests
 
 class ResourceAllocator:
     @staticmethod
@@ -120,7 +121,6 @@ class RiskAssessor:
         """
         Retrieves weather context for risk assessment.
         """
-        import requests
         api_key = SentinelSecrets.get_secret("OPENWEATHERMAP_API_KEY")
         if not api_key:
             return {"note": "Weather API key missing. Using seasonal averages.", "temp": "28C", "condition": "Cloudy"}

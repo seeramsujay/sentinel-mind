@@ -2,6 +2,8 @@ import math
 
 
 def haversine_distance(coord1: dict, coord2: dict) -> float | None:
+    if not isinstance(coord1, dict) or not isinstance(coord2, dict):
+        return None
     try:
         lat1 = coord1.get("lat") if coord1.get("lat") is not None else coord1.get("latitude")
         lon1 = coord1.get("lng") if coord1.get("lng") is not None else coord1.get("longitude")

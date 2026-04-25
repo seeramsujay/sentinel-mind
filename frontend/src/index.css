@@ -1,1 +1,137 @@
 @import "tailwindcss";
+
+@theme {
+  --color-outline-variant: #c3c6d7;
+  --color-inverse-primary: #b4c5ff;
+  --color-surface-dim: #d9d9e5;
+  --color-on-tertiary: #ffffff;
+  --color-surface-variant: #e1e2ed;
+  --color-on-primary: #ffffff;
+  --color-primary-fixed: #dbe1ff;
+  --color-on-background: #191b23;
+  --color-secondary-fixed-dim: #b3c5ff;
+  --color-error: #ba1a1a;
+  --color-surface-container: #ededf9;
+  --color-primary-container: #2563eb;
+  --color-surface-tint: #0053db;
+  --color-secondary: #445c9d;
+  --color-on-tertiary-container: #ffede6;
+  --color-on-error: #ffffff;
+  --color-inverse-surface: #2e3039;
+  --color-on-tertiary-fixed: #360f00;
+  --color-surface-container-highest: #e1e2ed;
+  --color-surface-container-high: #e7e7f3;
+  --color-on-surface-variant: #434655;
+  --color-surface: #faf8ff;
+  --color-primary: #004ac6;
+  --color-inverse-on-surface: #f0f0fb;
+  --color-on-primary-container: #eeefff;
+  --color-on-secondary: #ffffff;
+  --color-tertiary-fixed: #ffdbcd;
+  --color-tertiary-container: #bc4800;
+  --color-surface-container-low: #f3f3fe;
+  --color-secondary-fixed: #dbe1ff;
+  --color-on-primary-fixed-variant: #003ea8;
+  --color-on-error-container: #93000a;
+  --color-tertiary: #943700;
+  --color-background: #faf8ff;
+  --color-surface-bright: #faf8ff;
+  --color-error-container: #ffdad6;
+  --color-on-surface: #191b23;
+  --color-on-secondary-fixed-variant: #2b4384;
+  --color-surface-container-lowest: #ffffff;
+  --color-secondary-container: #9fb7ff;
+  --color-tertiary-fixed-dim: #ffb596;
+  --color-primary-fixed-dim: #b4c5ff;
+  --color-outline: #737686;
+  --color-on-secondary-fixed: #00184a;
+  --color-on-secondary-container: #2d4686;
+  --color-on-primary-fixed: #00174b;
+  --color-on-tertiary-fixed-variant: #7d2d00;
+  --font-data-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-body-prose: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-ui-header: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-data-terminal: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-ui-label-bold: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display-brand: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body-medium: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-canvas: #EEF2F7;
+  --color-brand-border: #DDE3EE;
+}
+
+@layer utilities {
+  .frosted {
+    backdrop-filter: blur(20px);
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .frosted-glass {
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .hex-background {
+    background-color: #EEF2F7;
+    background-image: radial-gradient(#DDE3EE 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .pulsing {
+    animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-slow-rotate {
+    animation: slow-rotate 60s linear infinite;
+  }
+
+  .scanning-line {
+    height: 2px;
+    background: linear-gradient(to right, transparent, #2563eb, transparent);
+    position: absolute;
+    width: 100%;
+    top: 0;
+    animation: scan 3s linear infinite;
+  }
+
+  .terminal-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .terminal-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .terminal-scroll::-webkit-scrollbar-thumb {
+    background: #DDE3EE;
+    border-radius: 2px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+  }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+@keyframes slow-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scan {
+  0% { top: 0%; opacity: 0; }
+  50% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}

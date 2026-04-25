@@ -4,7 +4,7 @@ import json
 import os
 from firebase_admin import firestore
 from vertexai.generative_models import GenerativeModel
-from orchestrator.auth import SentinelAuth
+from backend.orchestrator.auth import SentinelAuth
 
 class IngestionService:
     def __init__(self):

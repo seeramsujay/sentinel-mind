@@ -2,6 +2,7 @@ import os
 import threading
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Import the daemon entrypoints
 from backend.orchestrator.daemon import OrchestratorDaemon
@@ -10,9 +11,27 @@ from scripts.discord_actuator import main as discord_main
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 def health_check():
     return {"status": "ok", "service": "sentinel-mind-daemons"}
+
+@app.get("/emergencies")
+def get_emergencies():
+    from firebase_admin import firestore
+    try:
+        db = firestore.client()
+        docs = db.collection('emergencies').get()
+        return [doc.to_dict() | {"id": doc.id} for doc in docs]
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.on_event("startup")
 def startup_event():

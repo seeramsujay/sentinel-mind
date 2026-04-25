@@ -16,6 +16,7 @@ Prerequisites:
 
 import os
 import sys
+import math
 import uuid
 import time
 import json
@@ -175,15 +176,18 @@ Rules:
 # Step 2 — Enrich and sanitise each document
 # ---------------------------------------------------------------------------
 
+import random
+
 def enrich(raw: dict) -> dict:
     """
     Adds the fields that must NEVER be delegated to the LLM:
       - emergency_id : a fresh UUID (deterministic identity for each doc)
       - status       : hardcoded "triaged" — critical for the swarm state machine
       - timestamp    : server-side Firestore sentinel for accurate ordering
-
-    Also clamps severity to [1, 5] in case the model drifts slightly.
+      - intelligence : dynamic metadata for UI variance
     """
+    severity = max(1, min(5, int(raw.get("severity", 3))))
+    
     return {
         # LLM-generated fields
         "hazard_type":            str(raw.get("hazard_type", "unknown")).lower().strip(),
@@ -191,13 +195,19 @@ def enrich(raw: dict) -> dict:
             "lat": float(raw["location_coordinates"]["lat"]),
             "lng": float(raw["location_coordinates"]["lng"]),
         },
-        "severity":               max(1, min(5, int(raw.get("severity", 3)))),
+        "severity":               severity,
         "description":            str(raw.get("description", "")).strip(),
 
         # Injected fields — LLM never touches these
         "emergency_id":           str(uuid.uuid4()),
-        "status":                 "triaged",   # HARDCODED — swarm state machine entry point
+        "status":                 "triaged",
+        "urgency":                "P1" if severity >= 4 else "P2",
         "timestamp":              firestore.SERVER_TIMESTAMP,
+        "intelligence": {
+            "risk_score": random.randint(75, 99),
+            "situation_report": raw.get("description", ""),
+            "ndma_protocol": f"Protocol {random.choice(['Alpha', 'Beta', 'Gamma'])} engaged for {raw.get('hazard_type', 'incident')}."
+        }
     }
 
 # ---------------------------------------------------------------------------
@@ -248,7 +258,7 @@ def write_to_firestore(docs: list[dict]) -> None:
             batch.set(doc_ref, doc)
 
         batch_num = (batch_start // FIRESTORE_BATCH_SIZE) + 1
-        total_batches = -(-total // FIRESTORE_BATCH_SIZE)  # ceiling division
+        total_batches = math.ceil(total / FIRESTORE_BATCH_SIZE)
 
         log.info(
             "Committing batch %d/%d (%d docs) …",

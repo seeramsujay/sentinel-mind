@@ -5,8 +5,8 @@ from datetime import datetime, timedelta, timezone
 import logging
 from firebase_admin import firestore
 from dotenv import load_dotenv
-from orchestrator.auth import SentinelAuth
-from orchestrator.logistics_logic import ResourceAllocator, RoutingService, RiskAssessor, SDGMeter, VectorSearchClient
+from backend.orchestrator.auth import SentinelAuth
+from backend.orchestrator.logistics_logic import ResourceAllocator, RoutingService, RiskAssessor, SDGMeter, VectorSearchClient
 
 load_dotenv()
 
