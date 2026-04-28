@@ -32,7 +32,7 @@ class ResourceManager:
             
             if res_loc:
                 distance = haversine_distance(emergency_loc, res_loc)
-                if distance < min_distance:
+                if distance is not None and distance < min_distance:
                     min_distance = distance
                     best_unit = res_data
                     best_unit['id'] = doc.id # Ensure we have the firestore ID

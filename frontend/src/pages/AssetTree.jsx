@@ -57,21 +57,32 @@ const AssetTree = () => {
 
             <main className="flex flex-1 overflow-hidden">
                 {/* Center Column: Asset Tree Explorer */}
-                <div className="flex-1 flex flex-col bg-white border-r border-slate-200 relative z-40">
-                    <div className="p-6 border-b border-slate-200 bg-slate-50 flex items-center gap-4">
-                        <div className="relative flex-1">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                <div className="flex-1 flex flex-col bg-white border-r border-slate-200 relative z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+                    <div className="h-16 px-6 border-b border-slate-100 bg-slate-50/30 backdrop-blur-md flex items-center gap-6">
+                        <div className="flex flex-col min-w-max">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">REGISTRY</span>
+                            <span className="text-[14px] font-bold text-slate-900 leading-tight">ASSET EXPLORER</span>
+                        </div>
+                        
+                        <div className="relative flex-1 group">
+                            <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors text-[20px]">search</span>
                             <input 
                                 onKeyDown={(e) => e.key === 'Enter' && alert(`Deep-search initiated for asset: ${e.target.value}`)}
-                                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded bg-white text-slate-800 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" 
-                                placeholder="Search Asset ID, Type, or Fleet..." 
+                                className="w-full pl-11 pr-4 py-2 border border-slate-200 rounded-xl bg-white text-slate-800 focus:ring-1 focus:ring-black focus:border-black outline-none transition-all shadow-sm placeholder:text-slate-400 text-sm" 
+                                placeholder="Search Satellite ID, Ground Station, or Fleet Tag..." 
                                 type="text"
                             />
                         </div>
-                        <button onClick={() => alert('Asset filtering logic engaged: All Sectors')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer">
-                            <span className="material-symbols-outlined text-[18px]">filter_list</span>
-                            FILTERS
-                        </button>
+                        
+                        <div className="flex items-center gap-2">
+                            <button onClick={() => alert('Filtering: All Assets')} className="flex items-center gap-2 px-4 h-10 bg-white border border-slate-200 rounded-xl font-bold text-[11px] text-slate-600 hover:bg-slate-50 transition-all cursor-pointer shadow-sm hover:shadow active:scale-95 uppercase tracking-wider">
+                                <span className="material-symbols-outlined text-[18px]">filter_list</span>
+                                FILTERS
+                            </button>
+                            <button onClick={() => alert('Exporting Asset Registry')} className="p-2 h-10 w-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all cursor-pointer shadow-sm hover:shadow active:scale-95">
+                                <span className="material-symbols-outlined text-[20px]">ios_share</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
@@ -139,14 +150,17 @@ const AssetTree = () => {
                 </div>
 
                 {/* Right Column: Detail Panel */}
-                <aside className="w-[380px] bg-white flex flex-col border-l border-slate-200 relative z-40">
-                    <div className="p-6 border-b border-slate-200 bg-slate-50">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-xs font-bold text-blue-600 tracking-widest uppercase">Asset Profile</span>
-                            <button onClick={() => alert('Panel reset to default.')} className="material-symbols-outlined text-slate-400 hover:text-slate-800 cursor-pointer">close</button>
+                <aside className="w-[400px] bg-white flex flex-col border-l border-slate-200 relative z-40 shadow-[-4px_0_24px_rgba(0,0,0,0.02)]">
+                    <div className="p-6 border-b border-slate-100 bg-slate-50/50 backdrop-blur-sm">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-primary rounded-full"></span>
+                                <span className="text-[11px] font-black text-slate-400 tracking-[0.2em] uppercase">ASSET PROFILE</span>
+                            </div>
+                            <button onClick={() => alert('Panel reset to default.')} className="material-symbols-outlined text-slate-300 hover:text-slate-600 cursor-pointer transition-colors hover:bg-white p-1 rounded-md">close</button>
                         </div>
-                        <h2 className="font-bold text-xl text-slate-800 uppercase tracking-tight line-clamp-1">{selectedAsset.name}</h2>
-                        <p className="font-mono text-sm text-slate-500">SYS_ID: {selectedAsset.id}</p>
+                        <h2 className="font-bold text-2xl text-slate-900 uppercase tracking-tight leading-none mb-1 line-clamp-1">{selectedAsset.name}</h2>
+                        <p className="font-data-mono text-[11px] text-primary/60 font-bold tracking-widest uppercase">ID: {selectedAsset.id}</p>
                     </div>
 
                     <div className="flex-1 overflow-y-auto custom-scrollbar">

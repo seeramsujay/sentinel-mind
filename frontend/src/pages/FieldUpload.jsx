@@ -68,26 +68,30 @@ const FieldUpload = () => {
             {/* Main Content Area */}
             <main className="flex-1 flex overflow-hidden">
                 {/* Center Column: Vision Entry (75%) */}
-                <section className="flex-1 p-6 flex flex-col gap-6 border-r border-slate-200 overflow-y-auto relative z-40 custom-scrollbar">
-                    <div className="flex justify-between items-end">
-                        <div>
-                            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight uppercase">Vision Entry</h1>
-                            <p className="text-slate-500 text-[13px] font-medium uppercase font-data-terminal tracking-widest opacity-70">Telemetry source: Field Operator Unit-7</p>
+                <section className="flex-1 flex flex-col bg-white border-r border-slate-200 overflow-hidden relative z-40">
+                    {/* Internal Top Panel */}
+                    <div className="h-16 px-6 border-b border-slate-100 bg-slate-50/30 backdrop-blur-md flex items-center justify-between">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">OPERATOR PANEL</span>
+                            <h1 className="text-[18px] font-bold text-slate-900 leading-tight">VISION GATEWAY_ALPHA</h1>
                         </div>
-                        <div className="flex gap-2">
-                            <span className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-[9px] font-mono border border-blue-100">
-                                <span className={`w-1.5 h-1.5 rounded-full bg-blue-500 ${isDeploying ? 'animate-ping' : 'animate-pulse'}`}></span> {isDeploying ? 'SYNCING' : 'LINK_ACTIVE'}
-                            </span>
-                            <span className="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-[9px] font-mono border border-emerald-100">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> SECURE_CHANNEL
-                            </span>
+                        <div className="flex gap-3">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-[10px] font-bold border border-blue-100">
+                                <span className={`w-1.5 h-1.5 rounded-full bg-blue-500 ${isDeploying ? 'animate-ping' : 'animate-pulse'}`}></span>
+                                {isDeploying ? 'SYNCING...' : 'UPLINK_STABLE'}
+                            </div>
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-[10px] font-bold border border-emerald-100">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                ENCRYPTED
+                            </div>
                         </div>
                     </div>
 
-                    {/* Large Upload Area */}
-                    <div onClick={() => document.getElementById('field-image-input').click()} className="flex-1 bg-white border border-[#DDE3EE] rounded-lg shadow-sm relative overflow-hidden flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-blue-400 hex-background">
-                        {/* Scanning Line Animation */}
-                        <div className="scan"></div>
+                    <div className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-8">
+                        {/* Large Upload Area */}
+                        <div onClick={() => document.getElementById('field-image-input').click()} className="h-[400px] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-black hover:bg-white shadow-sm">
+                            {/* Scanning Line Animation */}
+                            <div className="absolute top-0 left-0 w-full h-0.5 bg-black/10 animate-[scan_3s_ease-in-out_infinite]"></div>
                         
                         {/* Hexagonal Target */}
                         <div className="relative w-48 h-48 flex items-center justify-center">
@@ -136,7 +140,8 @@ const FieldUpload = () => {
                             <span className="material-symbols-outlined">history</span>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
                 {/* Right Column: Metadata Detail Pane (320px) */}
                 <section className="w-[320px] bg-white p-6 flex flex-col gap-6 relative z-40 border-l border-slate-200">

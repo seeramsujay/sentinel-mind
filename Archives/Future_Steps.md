@@ -26,7 +26,7 @@
 - [ ] **Role 2**: Stress Test (100 signals / 5 seconds).
 
 ## Phase 4: The Splice & Submission (Day 5-6)
-- [ ] Full system integration testing.
-- [ ] Race condition debugging.
-- [ ] Golden Path simulation and Demo recording.
-- [ ] Final repo cleanup and submission.
+- [x] Full system integration testing.
+- [x] Race condition debugging.
+- [x] Golden Path simulation and Demo recording.
+- [x] Final repo cleanup and submission.

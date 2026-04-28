@@ -62,12 +62,14 @@ function App() {
 
       <main className="flex flex-1 overflow-hidden">
         {/* Left Sidebar: Agent Feed remains same */}
-        <aside className="w-[280px] bg-slate-50 border-r border-brand-border flex flex-col overflow-hidden relative z-40">
-          <div className="p-4 border-b border-brand-border bg-white">
-            <h2 className="font-ui-label-bold text-[12px] text-slate-500 uppercase tracking-widest font-bold">AGENT FEED</h2>
-            <div className="mt-2 flex items-center justify-between text-[10px] font-data-terminal text-slate-400 uppercase">
-              <span>Active Stream</span>
-              <span className="text-blue-600">Syncing...</span>
+        <aside className="w-[300px] bg-white border-r border-slate-200 flex flex-col overflow-hidden relative z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+          <div className="p-4 border-b border-slate-100 bg-slate-50/50 backdrop-blur-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="font-ui-label-bold text-[11px] text-slate-400 uppercase tracking-[0.1em] font-black">AGENT FEED</h2>
+              <div className="flex items-center gap-1.5 text-[10px] font-data-terminal text-blue-600/70 font-bold">
+                <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
+                SYNCING
+              </div>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto p-3 font-data-terminal text-[12px] terminal-scroll space-y-3 custom-scrollbar">
@@ -92,19 +94,64 @@ function App() {
           </div>
         </aside>
 
-        {/* Center Panel: Tactical Grid remains same */}
-        <section className="flex-1 relative bg-[#E8EFF9] overflow-hidden">
-          {isLoaded && (
-            <GoogleMap
-              mapContainerStyle={{ width: '100%', height: '100%' }}
-              center={{ lat: 20.5937, lng: 78.9629 }}
-              zoom={5}
-              options={{ disableDefaultUI: true }}
-            >
-              {filteredEmergencies.map((e, idx) => {
-                const lon = Number(e.location_coordinates?.lng || e.location?.lng || e.location?.longitude);
-                const lat = Number(e.location_coordinates?.lat || e.location?.lat || e.location?.latitude);
-                if (isNaN(lon) || isNaN(lat)) return null;
+        {/* Center Panel: Tactical Grid */}
+        <section className="flex-1 relative bg-[#E8EFF9] overflow-hidden flex flex-col">
+          {/* Internal Top Panel */}
+          <div className="h-14 bg-white/60 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-6 z-40">
+            <div className="flex items-center gap-4">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">SECTOR</span>
+                <span className="text-[14px] font-bold text-slate-900 leading-tight">GLOBAL TACTICAL GRID</span>
+              </div>
+              <div className="h-6 w-px bg-slate-200"></div>
+              <div className="flex gap-2">
+                <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-bold border border-blue-100 uppercase tracking-tight">LAYER: ORBITAL</span>
+                <span className="px-2 py-0.5 rounded bg-slate-50 text-slate-500 text-[10px] font-bold border border-slate-100 uppercase tracking-tight">LAYER: GROUND</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button className="p-1.5 hover:bg-white/50 rounded-lg text-slate-500 transition-all border border-transparent hover:border-slate-200">
+                <span className="material-symbols-outlined text-[20px]">zoom_in</span>
+              </button>
+              <button className="p-1.5 hover:bg-white/50 rounded-lg text-slate-500 transition-all border border-transparent hover:border-slate-200">
+                <span className="material-symbols-outlined text-[20px]">zoom_out</span>
+              </button>
+              <button className="p-1.5 hover:bg-white/50 rounded-lg text-slate-500 transition-all border border-transparent hover:border-slate-200">
+                <span className="material-symbols-outlined text-[20px]">my_location</span>
+              </button>
+              <div className="h-6 w-px bg-slate-200 mx-1"></div>
+              <button className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-lg text-[11px] font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg">
+                <span className="material-symbols-outlined text-[16px]">add_task</span>
+                NEW INCIDENT
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex-1 relative">
+            {/* Tactical Grid Overlay */}
+            <div className="absolute inset-0 opacity-40 z-10 pointer-events-none">
+              <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern height="40" id="grid" patternUnits="userSpaceOnUse" width="40">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#A9C0E4" strokeWidth="0.5"></path>
+                  </pattern>
+                </defs>
+                <rect fill="url(#grid)" height="100%" width="100%"></rect>
+              </svg>
+            </div>
+
+            {isLoaded && (
+              <GoogleMap
+                mapContainerStyle={{ width: '100%', height: '100%' }}
+                center={{ lat: 20.5937, lng: 78.9629 }}
+                zoom={5}
+                options={{ disableDefaultUI: true }}
+              >
+                {filteredEmergencies.map((e, idx) => {
+                  const lon = Number(e.location_coordinates?.lng || e.location?.lng || e.location?.longitude);
+                  const lat = Number(e.location_coordinates?.lat || e.location?.lat || e.location?.latitude);
+                  if (isNaN(lon) || isNaN(lat)) return null;
+
 
                 return (
                   <OverlayViewF
@@ -168,14 +215,17 @@ function App() {
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
         {/* Right Sidebar: SitReps */}
-        <aside className="w-[320px] bg-white border-l border-brand-border flex flex-col relative z-40">
-          <div className="p-4 border-b border-brand-border bg-slate-50/50">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-[12px] uppercase">Transparency</h2>
-              <span className="material-symbols-outlined text-sm text-slate-400">info</span>
+        <aside className="w-[340px] bg-white border-l border-slate-200 flex flex-col relative z-40 shadow-[-4px_0_24px_rgba(0,0,0,0.02)]">
+          <div className="p-5 border-b border-slate-100 bg-slate-50/50 backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-bold text-[11px] text-slate-400 uppercase tracking-[0.1em]">TRANSPARENCY</h2>
+              <button className="p-1.5 hover:bg-white rounded-md transition-colors shadow-sm border border-transparent hover:border-slate-100">
+                <span className="material-symbols-outlined text-[18px] text-slate-400">info</span>
+              </button>
             </div>
             <div className="space-y-4">
               {['Northern Perimeter', 'Urban Core Logistics'].map(zone => (
@@ -194,9 +244,12 @@ function App() {
           </div>
 
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-brand-border bg-white flex items-center justify-between">
-              <h2 className="font-bold text-[12px] uppercase">RAG SitReps</h2>
-              <span className="text-[10px] font-data-mono text-slate-400">Total: {filteredEmergencies.length}</span>
+            <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+              <h2 className="font-bold text-[11px] text-slate-400 uppercase tracking-[0.1em]">RAG SITREPS</h2>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-slate-200 rounded-full"></span>
+                <span className="text-[10px] font-data-mono text-slate-400 font-bold uppercase">TOTAL: {filteredEmergencies.length}</span>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
               {selectedInc ? (

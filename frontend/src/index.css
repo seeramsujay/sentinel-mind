@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -50,10 +51,10 @@
   --color-on-tertiary-fixed-variant: #7d2d00;
   --font-data-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-body-prose: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-ui-header: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-ui-header: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-data-terminal: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-ui-label-bold: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display-brand: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-ui-label-bold: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display-brand: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-body-medium: "Inter", ui-sans-serif, system-ui, sans-serif;
   --color-brand-canvas: #EEF2F7;
   --color-brand-border: #DDE3EE;

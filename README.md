@@ -11,18 +11,22 @@ When a disaster strikes, every minute of delay costs lives. SentinelMind is a mu
 
 ## Architecture
 
-```
-[RSS / Feedparser]  →  [Gemini 1.5 Flash Triage]  →  [/emergencies : triaged]
-         ↕
-[Discord Actuator]  ←  [status: dispatched]         ←  [Google Maps Routes API]
-         ↑                                                   ↕
-         ↘──────────────  [/emergencies : conflict]  ──  [Vertex AI
-         ↑                                                        Resolver]
-         ↘────────────  [/emergencies : awaiting_human_approval]  ←  [HITL]
-                                                              ↓
-                                                    [/emergencies : recovery]
-                                                              ↓
-                                                    [React Dashboard (live)]
+```mermaid
+graph TD
+    A[RSS / Feedparser] --> B[Gemini 1.5 Flash Triage]
+    B --> C((/emergencies : triaged))
+    C --> D[Google Maps Routes API]
+    D --> E((/emergencies : conflict))
+    D --> F((/emergencies : dispatched))
+    D --> G((/emergencies : awaiting_human_approval))
+    E --> H[Vertex AI Resolver]
+    H --> F
+    H --> G
+    G --> I[HITL Override]
+    I --> F
+    F --> J[Discord Actuator]
+    F --> K((/emergencies : recovery))
+    K --> L[React Dashboard live]
 ```
 
 ## Project Structure
