@@ -27,6 +27,10 @@ const AssetTree = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isDiagnosing, setIsDiagnosing] = useState(false);
     const [isDeployingResource, setIsDeployingResource] = useState(false);
+    const [showFilters, setShowFilters] = useState(false);
+    const [filterType, setFilterType] = useState('ALL');
+    const [diagnosticResult, setDiagnosticResult] = useState(null);
+    const [overrideStatus, setOverrideStatus] = useState(null);
 
     const toggle = (section) => {
         setExpanded(prev => ({ ...prev, [section]: !prev[section] }));
@@ -56,25 +60,43 @@ const AssetTree = () => {
     };
 
     const flattenFilter = (assetList) => {
-        if (!searchQuery) return assetList;
-        return assetList.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.id.toLowerCase().includes(searchQuery.toLowerCase()));
+        let filtered = assetList;
+        if (filterType !== 'ALL') {
+             if (filterType === 'CRITICAL') {
+                 filtered = filtered.filter(a => a.status === 'OFFLINE' || parseInt(a.battery) < 50);
+             } else {
+                 filtered = filtered.filter(a => a.status === filterType);
+             }
+        }
+        if (searchQuery) {
+            filtered = filtered.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.id.toLowerCase().includes(searchQuery.toLowerCase()));
+        }
+        return filtered;
     };
 
     const triggerDiagnostics = async () => {
         setIsDiagnosing(true);
+        setDiagnosticResult(null);
         try {
-            const res = await fetch('http://localhost:8080/api/assets/diagnose', {
+            const res = await fetch('http://127.0.0.1:8080/api/assets/diagnose', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ asset_id: selectedAsset.id })
             });
             const data = await res.json();
-            alert(`SYSLOG: Full diagnostic sweep complete for ${data.asset_id}.\n- Signal Integrity: ${data.diagnostics.signal_integrity}%\n- Logic Gate Sync: ${data.diagnostics.logic_gate_sync}\n- Internal Temp: ${data.diagnostics.internal_temp}°C\n- Drift: ${data.diagnostics.drift}%\n\nResult: ${data.diagnostics.result}`);
+            setDiagnosticResult({ success: true, message: `System Nominal. Logic Sync: ${data.diagnostics.logic_gate_sync}` });
+            setTimeout(() => setDiagnosticResult(null), 5000);
         } catch (e) {
             console.error(e);
-            alert("DIAGNOSTICS FAILED: Could not reach control subsystem.");
+            setDiagnosticResult({ success: false, message: "Diagnostics Failed: Comms Error" });
+            setTimeout(() => setDiagnosticResult(null), 5000);
         }
         setIsDiagnosing(false);
+    };
+
+    const handleOverride = () => {
+        setOverrideStatus('SIGNAL SENT');
+        setTimeout(() => setOverrideStatus(null), 3000);
     };
 
     const handleExport = () => {
@@ -119,10 +141,22 @@ const AssetTree = () => {
                         </div>
                         
                         <div className="flex items-center gap-2">
-                            <button onClick={() => alert('Filtering: All Assets')} className="flex items-center gap-2 px-4 h-10 bg-white border border-slate-200 rounded-xl font-bold text-[11px] text-slate-600 hover:bg-slate-50 transition-all cursor-pointer shadow-sm hover:shadow active:scale-95 uppercase tracking-wider">
-                                <span className="material-symbols-outlined text-[18px]">filter_list</span>
-                                FILTERS
-                            </button>
+                            <div className="relative">
+                                <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-2 px-4 h-10 border rounded-xl font-bold text-[11px] transition-all cursor-pointer shadow-sm hover:shadow active:scale-95 uppercase tracking-wider ${showFilters ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                                    <span className="material-symbols-outlined text-[18px]">filter_list</span>
+                                    FILTERS
+                                </button>
+                                {showFilters && (
+                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg z-50 p-2 py-2">
+                                        <p className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Asset Status</p>
+                                        <button onClick={() => { setShowFilters(false); setFilterType('ALL'); }} className={`w-full text-left px-3 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${filterType === 'ALL' ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50'}`}>Show All</button>
+                                        <button onClick={() => { setShowFilters(false); setFilterType('ONLINE'); }} className={`w-full text-left px-3 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${filterType === 'ONLINE' ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50'}`}>Active Only</button>
+                                        <button onClick={() => { setShowFilters(false); setFilterType('MAINTENANCE'); }} className={`w-full text-left px-3 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${filterType === 'MAINTENANCE' ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50'}`}>Maintenance</button>
+                                        <div className="my-1 border-t border-slate-100 p-0"></div>
+                                        <button onClick={() => { setShowFilters(false); setFilterType('CRITICAL'); }} className={`w-full text-left px-3 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${filterType === 'CRITICAL' ? 'bg-error/20 text-error' : 'text-error hover:bg-error/10'}`}>Critical Health</button>
+                                    </div>
+                                )}
+                            </div>
                             <button onClick={handleExport} className="p-2 h-10 w-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all cursor-pointer shadow-sm hover:shadow active:scale-95">
                                 <span className="material-symbols-outlined text-[20px]">ios_share</span>
                             </button>
@@ -152,14 +186,14 @@ const AssetTree = () => {
                                             temp: asset.temp
                                         }
                                     })}
-                                    className={`ml-8 flex items-center gap-3 py-2 px-4 hover:bg-slate-50 rounded border-l-2 cursor-pointer transition-all ${selectedAsset.id === asset.id ? 'bg-blue-50 border-blue-600' : 'border-transparent hover:border-blue-600'}`}
+                                    className={`ml-8 flex items-center gap-3 py-2 px-4 hover:bg-slate-50 rounded border-l-2 cursor-pointer transition-all ${selectedAsset?.id === asset.id ? 'bg-blue-50 border-blue-600' : 'border-transparent hover:border-blue-600'}`}
                                 >
                                     <div className={`w-2 h-2 rounded-full ${asset.status === 'ONLINE' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500'}`}></div>
                                     <div className="flex flex-col">
                                         <span className="font-bold text-[12px] text-slate-800">{asset.name}</span>
                                         <span className="font-mono text-slate-500 text-[11px]">ID: {asset.id} | {asset.status}</span>
                                     </div>
-                                    {asset.id === selectedAsset.id && (
+                                    {asset.id === selectedAsset?.id && (
                                         <span className="ml-auto material-symbols-outlined text-[18px] text-blue-600">radio_button_checked</span>
                                     )}
                                 </div>
@@ -180,7 +214,7 @@ const AssetTree = () => {
                                         connectivity: asset.status === 'ONLINE' ? '100%' : 'OFFLINE',
                                         telemetry: { speed: 'N/A', altitude: 'SEA LEVEL', battery: 'STATION POWER', temp: '22.0°C' }
                                     })}
-                                    className={`ml-8 flex items-center gap-3 py-2 px-4 hover:bg-slate-50 rounded border-l-2 cursor-pointer transition-all ${selectedAsset.id === asset.id ? 'bg-blue-50 border-blue-600' : 'border-transparent'}`}
+                                    className={`ml-8 flex items-center gap-3 py-2 px-4 hover:bg-slate-50 rounded border-l-2 cursor-pointer transition-all ${selectedAsset?.id === asset.id ? 'bg-blue-50 border-blue-600' : 'border-transparent'}`}
                                 >
                                     <div className={`w-2 h-2 rounded-full ${asset.status === 'ONLINE' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500'}`}></div>
                                     <div className="flex flex-col">
@@ -194,6 +228,7 @@ const AssetTree = () => {
                 </div>
 
                 {/* Right Column: Detail Panel */}
+                {selectedAsset ? (
                 <aside className="w-[400px] bg-white flex flex-col border-l border-slate-200 relative z-40 shadow-[-4px_0_24px_rgba(0,0,0,0.02)]">
                     <div className="p-6 border-b border-slate-100 bg-slate-50/50 backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-6">
@@ -201,7 +236,7 @@ const AssetTree = () => {
                                 <span className="w-2 h-2 bg-primary rounded-full"></span>
                                 <span className="text-[11px] font-black text-slate-400 tracking-[0.2em] uppercase">ASSET PROFILE</span>
                             </div>
-                            <button onClick={() => alert('Panel reset to default.')} className="material-symbols-outlined text-slate-300 hover:text-slate-600 cursor-pointer transition-colors hover:bg-white p-1 rounded-md">close</button>
+                            <button onClick={() => setSelectedAsset(null)} className="material-symbols-outlined text-slate-400 hover:text-error cursor-pointer transition-colors hover:bg-error/10 p-1 rounded-md">close</button>
                         </div>
                         <h2 className="font-bold text-2xl text-slate-900 uppercase tracking-tight leading-none mb-1 line-clamp-1">{selectedAsset.name}</h2>
                         <p className="font-data-mono text-[11px] text-primary/60 font-bold tracking-widest uppercase">ID: {selectedAsset.id}</p>
@@ -259,17 +294,29 @@ const AssetTree = () => {
                         </section>
                     </div>
 
-                    <div className="p-4 bg-white border-t border-slate-200 grid grid-cols-2 gap-2">
-                        <button onClick={triggerDiagnostics} className="px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer active:scale-95 shadow-sm">
-                            {isDiagnosing ? 'SCANNING...' : 'DIAGNOSTICS'}
-                        </button>
-                        <button onClick={() => {
-                            alert(`ATTENTION: Override signal sent to ${selectedAsset.id}. Manual control established over telemetry node ${selectedAsset.id.split('-')[1]}.`);
-                        }} className="px-4 py-2 bg-blue-600 text-white rounded font-bold text-[12px] hover:bg-blue-700 transition-all cursor-pointer shadow-md active:scale-95 border border-transparent">
-                            OVERRIDE
-                        </button>
+                    <div className="p-4 bg-white border-t border-slate-200 flex flex-col gap-2">
+                        {diagnosticResult && (
+                           <div className={`p-2 rounded text-[10px] font-mono font-bold border ${diagnosticResult.success ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-red-50 text-error border-red-200'}`}>
+                               {'>'} {diagnosticResult.message}
+                           </div>
+                        )}
+                        <div className="grid grid-cols-2 gap-2">
+                            <button onClick={triggerDiagnostics} className="px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer active:scale-95 shadow-sm">
+                                {isDiagnosing ? 'SCANNING...' : 'DIAGNOSTICS'}
+                            </button>
+                            <button onClick={handleOverride} className={`px-4 py-2 text-white rounded font-bold text-[12px] transition-all cursor-pointer shadow-md active:scale-95 border ${overrideStatus ? 'bg-emerald-500 border-emerald-600 shadow-emerald-500/20' : 'bg-blue-600 hover:bg-blue-700 border-transparent shadow-blue-600/20'}`}>
+                                {overrideStatus || 'OVERRIDE'}
+                            </button>
+                        </div>
                     </div>
                 </aside>
+                ) : (
+                <aside className="w-[400px] bg-slate-50 flex flex-col items-center justify-center border-l border-slate-200 relative z-40">
+                    <span className="material-symbols-outlined text-[64px] text-slate-200 mb-4 animate-pulse">satellite_alt</span>
+                    <h3 className="font-bold text-slate-400 uppercase tracking-widest text-[14px]">NO ASSET SELECTED</h3>
+                    <p className="text-slate-400 text-xs mt-2">Select a node from the registry.</p>
+                </aside>
+                )}
             </main>
             
             {/* Standardized Command Bar */}

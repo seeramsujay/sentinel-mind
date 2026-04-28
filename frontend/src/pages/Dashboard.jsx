@@ -49,7 +49,7 @@ function App() {
       
       // Fallback: Proxy via Backend (Role 1 Service Account Bypass)
       try {
-        const res = await fetch('http://localhost:8080/emergencies');
+        const res = await fetch('http://127.0.0.1:8080/emergencies');
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
            setEmergencies(data);
@@ -88,6 +88,18 @@ function App() {
   }, []);
 
   const [showLog, setShowLog] = useState(false);
+
+  const mapCenter = React.useMemo(() => {
+    if (selectedInc) {
+      const lng = Number(selectedInc.location_coordinates?.lng || selectedInc.location?.lng || selectedInc.location?.longitude);
+      const lat = Number(selectedInc.location_coordinates?.lat || selectedInc.location?.lat || selectedInc.location?.latitude);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        return { lat, lng };
+      }
+    }
+    return { lat: 20.5937, lng: 78.9629 };
+  }, [selectedInc]);
+
 
   useEffect(() => {
     // Reset log view when selected incident changes
@@ -137,7 +149,7 @@ function App() {
                 }`}
               >
                 <div className="flex justify-between opacity-60 text-[10px]">
-                  <span>[{e.timestamp ? new Date(e.timestamp).toLocaleTimeString() : 'LIVE'}]</span>
+                  <span>[{e.timestamp ? (typeof e.timestamp.toDate === 'function' ? e.timestamp.toDate().toLocaleTimeString() : new Date(e.timestamp).toLocaleTimeString()) : 'LIVE'}]</span>
                   <span className={e.urgency === 'P1' ? 'text-error font-bold' : 'text-blue-600'}>{e.status?.toUpperCase() || 'TRIAGE'}</span>
                 </div>
                 <p className="text-slate-800 font-medium truncate">{e.hazard_type}: {e.location_coordinates?.lat?.toFixed(2) || 'Sector 7G'}</p>
@@ -196,8 +208,8 @@ function App() {
             {isLoaded && (
               <GoogleMap
                 mapContainerStyle={{ width: '100%', height: '100%' }}
-                center={{ lat: 20.5937, lng: 78.9629 }}
-                zoom={5}
+                center={mapCenter}
+                zoom={selectedInc ? 7 : 5}
                 options={{ disableDefaultUI: true }}
               >
                 {filteredEmergencies.map((e, idx) => {

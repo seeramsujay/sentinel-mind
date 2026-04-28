@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
 
   const isActive = (path) => location.pathname === path;
 
@@ -56,13 +59,51 @@ const Header = () => {
           />
         </div>
         <div className="flex gap-1">
-          <button onClick={() => alert('Toggle Notifications')} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 cursor-pointer active:scale-95 transition-all relative">
-            <span className="material-symbols-outlined text-[22px]">notifications</span>
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-          </button>
-          <button onClick={() => alert('Settings Menu')} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 cursor-pointer active:scale-95 transition-all">
-            <span className="material-symbols-outlined text-[22px]">settings</span>
-          </button>
+          <div className="relative">
+            <button onClick={() => {setShowNotifications(!showNotifications); setShowSettings(false);}} className={`p-2 rounded-lg cursor-pointer active:scale-95 transition-all relative ${showNotifications ? 'bg-slate-100 text-blue-600' : 'hover:bg-slate-100 text-slate-500'}`}>
+              <span className="material-symbols-outlined text-[22px]">notifications</span>
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
+            {showNotifications && (
+              <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden text-left origin-top-right animate-in fade-in zoom-in-95 duration-200">
+                  <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/80 backdrop-blur-sm">
+                      <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">System Alerts</span>
+                      <span className="text-[9px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full cursor-pointer hover:bg-blue-100 transition-colors uppercase">CLEAR</span>
+                  </div>
+                  <div className="p-2 text-xs max-h-64 overflow-y-auto">
+                      <div className="p-3 hover:bg-slate-50 rounded-lg cursor-pointer border-b border-transparent transition-colors group">
+                          <span className="font-bold text-error flex items-center gap-2 mb-1 text-[11px]"><span className="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span> CRITICAL: Sector Alpha Surge</span>
+                          <span className="text-slate-500 text-[10px] block leading-snug">Multiple high-priority disaster signals detected in quadrant 4. Requesting immediate verification.</span>
+                          <span className="text-slate-400 text-[9px] mt-1 block uppercase font-mono group-hover:text-error transition-colors">2 mins ago</span>
+                      </div>
+                      <div className="p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors group mt-1">
+                          <span className="font-bold text-slate-700 flex items-center gap-2 mb-1 text-[11px]"><span className="material-symbols-outlined text-[12px] text-blue-600">tune</span> SYSTEM: Diagnostic Complete</span>
+                          <span className="text-slate-500 text-[10px] block leading-snug">AEGIS-02 thermal imaging subsystem calibration executed successfully.</span>
+                          <span className="text-slate-400 text-[9px] mt-1 block uppercase font-mono">14 mins ago</span>
+                      </div>
+                  </div>
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <button onClick={() => {setShowSettings(!showSettings); setShowNotifications(false);}} className={`p-2 rounded-lg cursor-pointer active:scale-95 transition-all ${showSettings ? 'bg-slate-100 text-blue-600' : 'hover:bg-slate-100 text-slate-500'}`}>
+              <span className="material-symbols-outlined text-[22px]">settings</span>
+            </button>
+            {showSettings && (
+               <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 z-50 p-2 origin-top-right animate-in fade-in zoom-in-95 duration-200">
+                   <button onClick={() => setShowSettings(false)} className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 rounded-lg transition-colors cursor-pointer flex items-center gap-2 mb-1">
+                       <span className="material-symbols-outlined text-[16px] opacity-70">account_circle</span> Identity Matrix
+                   </button>
+                   <button onClick={() => setShowSettings(false)} className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 rounded-lg transition-colors cursor-pointer flex items-center gap-2 mb-1">
+                       <span className="material-symbols-outlined text-[16px] opacity-70">admin_panel_settings</span> Access Control
+                   </button>
+                   <div className="h-px w-full bg-slate-100 my-1"></div>
+                   <button onClick={() => setShowSettings(false)} className="w-full text-left px-3 py-2 text-xs font-bold text-slate-500 hover:bg-error/10 hover:text-error rounded-lg transition-colors cursor-pointer flex items-center gap-2">
+                       <span className="material-symbols-outlined text-[16px] opacity-70">delete_forever</span> Clear Cache
+                   </button>
+               </div>
+            )}
+          </div>
           <button onClick={() => alert('Support Portal')} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 cursor-pointer active:scale-95 transition-all">
             <span className="material-symbols-outlined text-[22px]">help</span>
           </button>

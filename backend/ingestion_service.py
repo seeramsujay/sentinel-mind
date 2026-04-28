@@ -47,7 +47,7 @@ class IngestionService:
         Task: Convert unstructured disaster alert into a structured JSON emergency report.
         
         Alert Title: {entry.title}
-        Alert Description: {getattr(entry, 'description', getattr(entry, 'summary', 'No description available'))}
+        Alert Description: {entry.description}
         
         Output Requirements (JSON):
         1. hazard_type (Flood, Earthquake, Fire, Cyclone, etc.)
