@@ -26,29 +26,34 @@ const FieldUpload = () => {
         setIsDeploying(true);
         setStatusText("INITIATING CLOUD HANDSHAKE...");
         setProgress(10);
-        
+
         try {
-            let b64 = previewUrl;
+            let b64 = "";
             let mime = "image/jpeg";
-            if (previewUrl.includes(',')) {
+            
+            if (previewUrl.startsWith('data:')) {
                 b64 = previewUrl.split(',')[1];
                 mime = previewUrl.split(';')[0].split(':')[1];
+            } else if (previewUrl.startsWith('http')) {
+                // Handle the default placeholder image gracefully
+                setStatusText("PROCESSING SYSTEM ASSET...");
+                b64 = "MOCK_BASE64_FOR_DEMO"; 
             } else {
-                throw new Error("Invalid format. Please drag and drop a valid image file.");
+                throw new Error("Invalid source data. Please reload the image.");
             }
-            
+
             setProgress(30);
             const res = await fetch('http://127.0.0.1:8080/api/vision/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ image_b64: b64, mime_type: mime })
             });
-            
+
             setProgress(70);
             if (!res.ok) throw new Error("Backend offline");
 
             const data = await res.json();
-            
+
             setMetadata(data);
             setProgress(100);
             setStatusText("DEPLOYMENT COMPLETE: METADATA EXTRACTED");
@@ -79,11 +84,11 @@ const FieldUpload = () => {
     return (
         <div className="bg-[#EEF2F7] font-body-medium text-slate-800 h-screen overflow-hidden flex flex-col pt-14">
             <Header />
-            <input 
-                type="file" 
-                id="field-image-input" 
-                className="hidden" 
-                accept="image/*" 
+            <input
+                type="file"
+                id="field-image-input"
+                className="hidden"
+                accept="image/*"
                 onChange={onFileSelect}
             />
 
@@ -114,56 +119,68 @@ const FieldUpload = () => {
                         <div onClick={() => document.getElementById('field-image-input').click()} className="h-[400px] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-black hover:bg-white shadow-sm">
                             {/* Scanning Line Animation */}
                             <div className="absolute top-0 left-0 w-full h-0.5 bg-black/10 animate-[scan_3s_ease-in-out_infinite]"></div>
-                        
-                        {/* Hexagonal Target */}
-                        <div className="relative w-48 h-48 flex items-center justify-center">
-                            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
-                                <polygon className="group-hover:stroke-blue-600 transition-colors" fill="none" points="50,5 93,30 93,70 50,95 7,70 7,30" stroke="#2563eb" strokeDasharray="4 4" strokeWidth="1.5"></polygon>
-                            </svg>
-                            <div className="flex flex-col items-center gap-3 text-blue-600">
-                                <span className="material-symbols-outlined text-5xl">cloud_upload</span>
-                                <span className="font-bold text-[10px] tracking-widest uppercase font-ui-label-bold">Drop Imagery</span>
-                            </div>
-                        </div>
-                        <div className="mt-8 text-center relative z-20">
-                            <p className="font-bold text-slate-800 font-data-mono text-sm tracking-tighter">DRAG_AND_DROP_FIELD_DATA</p>
-                            <p className="text-slate-400 text-[10px] mt-1 font-data-mono opacity-60">SUPPORTED: RAW, JPG, NITF-2.1, PNG | MAX_SIZE: 50MB</p>
-                        </div>
 
-                        {/* Processing State Footer */}
-                        <div className="absolute bottom-12 w-full px-24">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="font-data-terminal text-[9px] text-blue-600 font-bold uppercase tracking-widest">
-                                    {isDeploying ? "Uploading Telemetry..." : (progress === 100 ? "Deployment Complete" : "Awaiting Data Upload")}
-                                </span>
-                                <span className="font-data-terminal text-[9px] text-blue-600 font-bold">{progress}%</span>
-                            </div>
-                            <div className="h-1 bg-blue-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${progress}%` }}></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Quick Access Assets */}
-                    <div className="grid grid-cols-4 gap-4 pb-20">
-                        {[1, 2].map(i => (
-                            <div key={i} onClick={() => alert(`Reviewing source IMG_ZONE_NORTH_0${i}.RAW`)} className="bg-white border border-[#DDE3EE] rounded p-3 flex flex-col justify-between hover:border-blue-400 transition-all cursor-pointer shadow-sm active:scale-95 transition-transform">
-                                <div className="flex justify-between items-start">
-                                    <span className="material-symbols-outlined text-slate-300 text-lg">image</span>
-                                    <span className="text-[9px] font-data-mono text-slate-400">{i * 6}.4 MB</span>
+                            {/* Hexagonal Target & Image Preview */}
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                {previewUrl && (
+                                    <img 
+                                        src={previewUrl} 
+                                        alt="Field Intel" 
+                                        className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
+                                    />
+                                )}
+                                
+                                <div className="relative w-48 h-48 flex items-center justify-center z-20">
+                                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+                                        <polygon className="group-hover:stroke-blue-600 transition-colors" fill="none" points="50,5 93,30 93,70 50,95 7,70 7,30" stroke="#2563eb" strokeDasharray="4 4" strokeWidth="1.5"></polygon>
+                                    </svg>
+                                    <div className={`flex flex-col items-center gap-3 ${previewUrl ? 'text-white' : 'text-blue-600'}`}>
+                                        <span className="material-symbols-outlined text-5xl">cloud_upload</span>
+                                        <span className="font-bold text-[10px] tracking-widest uppercase font-ui-label-bold">
+                                            {previewUrl ? 'UPLOADED_READY' : 'Drop Imagery'}
+                                        </span>
+                                    </div>
                                 </div>
-                                <p className="text-[9px] font-data-terminal text-slate-600 truncate uppercase mt-2">IMG_ZONE_NORTH_0{i}.RAW</p>
                             </div>
-                        ))}
-                        <div onClick={() => alert('Protocol Alpha: Add New Feed Source')} className="bg-white border border-[#DDE3EE] border-dashed rounded p-3 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-300 transition-all cursor-pointer active:scale-95 transition-transform">
-                            <span className="material-symbols-outlined">add_circle</span>
+                            <div className="mt-8 text-center relative z-20">
+                                <p className="font-bold text-slate-800 font-data-mono text-sm tracking-tighter">DRAG_AND_DROP_FIELD_DATA</p>
+                                <p className="text-slate-400 text-[10px] mt-1 font-data-mono opacity-60">SUPPORTED: RAW, JPG, NITF-2.1, PNG | MAX_SIZE: 50MB</p>
+                            </div>
+
+                            {/* Processing State Footer */}
+                            <div className="absolute bottom-12 w-full px-24">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="font-data-terminal text-[9px] text-blue-600 font-bold uppercase tracking-widest">
+                                        {isDeploying ? "Uploading Telemetry..." : (progress === 100 ? "Deployment Complete" : "Awaiting Data Upload")}
+                                    </span>
+                                    <span className="font-data-terminal text-[9px] text-blue-600 font-bold">{progress}%</span>
+                                </div>
+                                <div className="h-1 bg-blue-100 rounded-full overflow-hidden">
+                                    <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${progress}%` }}></div>
+                                </div>
+                            </div>
                         </div>
-                        <div onClick={() => alert('Accessing Telemetry History Logs')} className="bg-slate-50 border border-[#DDE3EE] rounded p-3 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all cursor-pointer active:scale-95 transition-transform">
-                            <span className="material-symbols-outlined">history</span>
+
+                        {/* Quick Access Assets */}
+                        <div className="grid grid-cols-4 gap-4 pb-20">
+                            {[1, 2].map(i => (
+                                <div key={i} onClick={() => alert(`Reviewing source IMG_ZONE_NORTH_0${i}.RAW`)} className="bg-white border border-[#DDE3EE] rounded p-3 flex flex-col justify-between hover:border-blue-400 transition-all cursor-pointer shadow-sm active:scale-95 transition-transform">
+                                    <div className="flex justify-between items-start">
+                                        <span className="material-symbols-outlined text-slate-300 text-lg">image</span>
+                                        <span className="text-[9px] font-data-mono text-slate-400">{i * 6}.4 MB</span>
+                                    </div>
+                                    <p className="text-[9px] font-data-terminal text-slate-600 truncate uppercase mt-2">IMG_ZONE_NORTH_0{i}.RAW</p>
+                                </div>
+                            ))}
+                            <div onClick={() => alert('Protocol Alpha: Add New Feed Source')} className="bg-white border border-[#DDE3EE] border-dashed rounded p-3 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-300 transition-all cursor-pointer active:scale-95 transition-transform">
+                                <span className="material-symbols-outlined">add_circle</span>
+                            </div>
+                            <div onClick={() => alert('Accessing Telemetry History Logs')} className="bg-slate-50 border border-[#DDE3EE] rounded p-3 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all cursor-pointer active:scale-95 transition-transform">
+                                <span className="material-symbols-outlined">history</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
                 {/* Right Column: Metadata Detail Pane (320px) */}
                 <section className="w-[320px] bg-white p-6 flex flex-col gap-6 relative z-40 border-l border-slate-200">
@@ -234,8 +251,8 @@ const FieldUpload = () => {
 
             {/* Standardized Command Bar */}
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-5xl h-20 frosted border border-white/60 rounded-2xl shadow-2xl z-[100] flex items-center px-6 gap-6">
-                <button 
-                    onClick={handleDeploy} 
+                <button
+                    onClick={handleDeploy}
                     disabled={isDeploying}
                     className={`h-12 ${isDeploying ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary hover:bg-primary/90'} text-white text-[12px] font-bold px-8 rounded-xl flex items-center gap-3 transition-all active:scale-95 shadow-lg shadow-primary/20 whitespace-nowrap`}
                 >

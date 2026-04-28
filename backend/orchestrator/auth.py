@@ -2,7 +2,7 @@ class SentinelAuth:
     @staticmethod
     def get_project_id():
         import os
-        return os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCP_PROJECT")
+        return os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCP_PROJECT") or os.getenv("GCP_PROJECT_ID")
 
     @staticmethod
     def get_firestore():

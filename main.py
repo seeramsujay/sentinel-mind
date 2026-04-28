@@ -50,7 +50,9 @@ def vision_analyze(req: VisionRequest):
     
     try:
         SentinelAuth.init_vertex()
-        model = GenerativeModel("gemini-2.5-flash-lite")
+        # Use a stable, production-ready model ID
+        model_id = os.getenv("VERTEX_MODEL_ID", "gemini-1.5-flash")
+        model = GenerativeModel(model_id)
         image_data = base64.b64decode(req.image_b64)
         image_part = Part.from_data(data=image_data, mime_type=req.mime_type)
         
@@ -116,5 +118,9 @@ def startup_event():
     conflict_thread.start()
 
 if __name__ == "__main__":
+    # The uvicorn.run call is BLOCKING, so it must be the very last thing.
+    # The daemons are already started in the @app.on_event("startup") handler
+    # or should be started in threads before calling run.
+    
     port = int(os.environ.get("PORT", 8080))
     uvicorn.run("main:app", host="0.0.0.0", port=port)
