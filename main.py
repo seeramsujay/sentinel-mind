@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+@app.get("/health")
 def health_check():
     return {"status": "ok", "service": "sentinel-mind-daemons"}
 
@@ -96,6 +96,16 @@ def diagnose_asset(req: DiagnoseRequest):
             "result": "ALL SYSTEMS NOMINAL"
         }
     }
+
+from fastapi.responses import FileResponse
+
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    dist_dir = os.path.join(os.path.dirname(__file__), "frontend/dist")
+    file_path = os.path.join(dist_dir, full_path)
+    if full_path and os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(file_path)
+    return FileResponse(os.path.join(dist_dir, "index.html"))
 
 @app.on_event("startup")
 def startup_event():
