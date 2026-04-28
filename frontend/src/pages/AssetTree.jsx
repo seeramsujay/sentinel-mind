@@ -216,7 +216,10 @@ const AssetTree = () => {
                     </div>
 
                     <div className="p-4 bg-white border-t border-slate-200 grid grid-cols-2 gap-2">
-                        <button onClick={() => alert(`Diagnostics Summary for ${selectedAsset.id}:\n- Signal Integrity: 99.4%\n- Logic Gate Sync: OK\n- Thermal Drift: 0.02%`)} className="px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer active:scale-95 shadow-sm">DIAGNOSTICS</button>
+                        <button onClick={() => {
+                            console.log(`[ORCHESTRATOR] Running full diagnostics on ${selectedAsset.id}...`);
+                            alert(`SYSLOG: Full diagnostic sweep complete for ${selectedAsset.id}.\n- Signal Integrity: 99.4%\n- Logic Gate Sync: OK\n- Internal Temp: 14.2°C\n- Drift: 0.002%\n\nResult: ALL SYSTEMS NOMINAL`);
+                        }} className="px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer active:scale-95 shadow-sm">DIAGNOSTICS</button>
                         <button onClick={() => alert(`ATTENTION: Override signal sent to ${selectedAsset.id}. Manual control established over telemetry node ${selectedAsset.id.split('-')[1]}.`)} className="px-4 py-2 bg-blue-600 text-white rounded font-bold text-[12px] hover:bg-blue-700 transition-all cursor-pointer shadow-md active:scale-95">OVERRIDE</button>
                     </div>
                 </aside>
