@@ -43,7 +43,7 @@ const FieldUpload = () => {
             }
 
             setProgress(30);
-            const res = await fetch('http://127.0.0.1:8080/api/vision/analyze', {
+            const res = await fetch('https://sentinel-mind-51884867643.us-central1.run.app/api/vision/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ image_b64: b64, mime_type: mime })

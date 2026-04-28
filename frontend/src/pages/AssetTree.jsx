@@ -78,7 +78,7 @@ const AssetTree = () => {
         setIsDiagnosing(true);
         setDiagnosticResult(null);
         try {
-            const res = await fetch('http://127.0.0.1:8080/api/assets/diagnose', {
+            const res = await fetch('https://sentinel-mind-51884867643.us-central1.run.app/api/assets/diagnose', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ asset_id: selectedAsset.id })

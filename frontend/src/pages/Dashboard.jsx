@@ -49,7 +49,7 @@ function App() {
       
       // Fallback: Proxy via Backend (Role 1 Service Account Bypass)
       try {
-        const res = await fetch('http://127.0.0.1:8080/emergencies');
+        const res = await fetch('https://sentinel-mind-51884867643.us-central1.run.app/emergencies');
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
            setEmergencies(data);
