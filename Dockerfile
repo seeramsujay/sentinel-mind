@@ -13,7 +13,6 @@ COPY . .
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
-ENV PORT=8080
 
 # Cloud Run entrypoint
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD exec python main.py
