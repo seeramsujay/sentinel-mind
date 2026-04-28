@@ -6,6 +6,7 @@ const FieldUpload = () => {
     const [isDeploying, setIsDeploying] = useState(false);
     const [statusText, setStatusText] = useState("Awaiting cloud deployment orchestration...");
     const [previewUrl, setPreviewUrl] = useState("https://lh3.googleusercontent.com/aida-public/AB6AXuDFcfCaVGsX6cvaTIqxJJ0IrgxPniIR6C1hJuA9iqhmhCjQ99am3v01QsVGYQJo3bj8PJz0DmmY2Q9MaSizku06Z3NYg6vthdZzOMEAa1K1YSDIJFWNd2hSXITGn3c1Tj6A8hjXIaQyPNvg6mHzu5PpRVDjC_tAes0E0j1kNLRI904SRu-T84Wj2XKhBM7GvI5ZDX7U1O3cZsxnVqHgpnAaxTdTUlZtPVI7pZ6frnxoGVMb4wwTaN2FWShR-nAptMpDagKD7mzFcv8");
+    const [metadata, setMetadata] = useState(null);
 
     const onFileSelect = (e) => {
         const file = e.target.files[0];
@@ -20,22 +21,43 @@ const FieldUpload = () => {
         }
     };
 
-    const handleDeploy = () => {
+    const handleDeploy = async () => {
         if (isDeploying) return;
         setIsDeploying(true);
         setStatusText("INITIATING CLOUD HANDSHAKE...");
-        let current = 0;
-        const interval = setInterval(() => {
-            current += Math.floor(random(5, 15));
-            if (current >= 100) {
-                current = 100;
-                clearInterval(interval);
-                setIsDeploying(false);
-                setStatusText("DEPLOYMENT COMPLETE: SECTOR_7G_SYNCED");
-                alert("ST-01: Cloud Synchronization Successful.\n\nAll field telemetry has been pushed to the Orchestrator.");
+        setProgress(10);
+        
+        try {
+            let b64 = previewUrl;
+            let mime = "image/jpeg";
+            if (previewUrl.includes(',')) {
+                b64 = previewUrl.split(',')[1];
+                mime = previewUrl.split(';')[0].split(':')[1];
+            } else {
+                throw new Error("Invalid format. Please drag and drop a valid image file.");
             }
-            setProgress(current);
-        }, 300);
+            
+            setProgress(30);
+            const res = await fetch('http://localhost:8080/api/vision/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image_b64: b64, mime_type: mime })
+            });
+            
+            setProgress(70);
+            if (!res.ok) throw new Error("Backend offline");
+
+            const data = await res.json();
+            
+            setMetadata(data);
+            setProgress(100);
+            setStatusText("DEPLOYMENT COMPLETE: METADATA EXTRACTED");
+        } catch (e) {
+            console.error(e);
+            setStatusText("UPLOAD FAILED - CHECK BACKEND");
+            setProgress(0);
+        }
+        setIsDeploying(false);
     };
 
     const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -147,39 +169,55 @@ const FieldUpload = () => {
                 <section className="w-[320px] bg-white p-6 flex flex-col gap-6 relative z-40 border-l border-slate-200">
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
                         <h3 className="font-ui-label-bold text-[10px] uppercase tracking-widest text-slate-400 mb-6 font-bold">Extracted Metadata</h3>
-                        <div className="space-y-4 font-data-terminal text-[11px]">
-                            <div className="p-3 bg-slate-50 border border-slate-100 rounded">
-                                <p className="text-slate-400 mb-1 text-[9px] uppercase tracking-tighter font-bold">COORDINATE_FIX</p>
-                                <div className="flex justify-between items-center text-slate-900 font-bold">
-                                    <span>40.7128° N, 74.0060° W</span>
-                                    <span className="material-symbols-outlined text-emerald-500 text-sm">location_on</span>
+                        {metadata ? (
+                            <div className="space-y-4 font-data-terminal text-[11px]">
+                                <div className="p-3 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-slate-400 mb-1 text-[9px] uppercase tracking-tighter font-bold">COORDINATE_FIX</p>
+                                    <div className="flex justify-between items-center text-slate-900 font-bold">
+                                        <span>{metadata.extracted_coordinates || 'N/A'}</span>
+                                        <span className="material-symbols-outlined text-emerald-500 text-sm">location_on</span>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="p-3 bg-slate-50 border border-slate-100 rounded">
-                                <p className="text-slate-400 mb-1 text-[9px] uppercase tracking-tighter font-bold">AI Confidence Score</p>
-                                <div className="flex items-center gap-3">
-                                    <div className="flex-grow h-1 bg-slate-200 rounded-full overflow-hidden">
-                                        <div className="h-full bg-emerald-500 w-[94%]"></div>
+                                <div className="p-3 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-slate-400 mb-1 text-[9px] uppercase tracking-tighter font-bold">AI Confidence Score</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex-grow h-1 bg-slate-200 rounded-full overflow-hidden">
+                                            <div className="h-full bg-emerald-500 transition-all" style={{ width: `${metadata.confidence || 0}%` }}></div>
+                                        </div>
+                                        <span className="text-emerald-600 font-bold">{metadata.confidence || 0}%</span>
                                     </div>
-                                    <span className="text-emerald-600 font-bold">94%</span>
                                 </div>
-                            </div>
 
-                            <div className="p-3 bg-slate-50 border border-slate-100 rounded">
-                                <p className="text-slate-400 mb-1 text-[9px] uppercase tracking-tighter font-bold">Detected Objects</p>
-                                <div className="space-y-2 mt-2">
-                                    <div className="flex justify-between text-blue-600 font-bold">
-                                        <span>Unit-7</span>
-                                        <span className="opacity-70 text-[9px]">[FRIENDLY]</span>
-                                    </div>
-                                    <div className="flex justify-between text-red-600 font-bold">
-                                        <span>Hazard-Alpha</span>
-                                        <span className="opacity-70 text-[9px]">[HOSTILE]</span>
+                                <div className="p-3 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-slate-400 mb-1 text-[9px] uppercase tracking-tighter font-bold">Detected Objects / Analysis</p>
+                                    <div className="space-y-2 mt-2">
+                                        {(metadata.objects_detected || ["No hazards identified"]).map((obj, i) => (
+                                            <div key={i} className="flex justify-between text-blue-600 font-bold">
+                                                <span>{obj}</span>
+                                                <span className="opacity-70 text-[9px]">[SCANNED]</span>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="space-y-4 font-data-terminal text-[11px]">
+                                <div className="p-3 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-slate-400 mb-1 text-[9px] uppercase tracking-tighter font-bold">COORDINATE_FIX</p>
+                                    <div className="flex justify-between items-center text-slate-400 font-bold">
+                                        <span>AWAITING TELEMETRY</span>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-slate-400 mb-1 text-[9px] uppercase tracking-tighter font-bold">AI Confidence Score</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex-grow h-1 bg-slate-200 rounded-full overflow-hidden"></div>
+                                        <span className="text-emerald-600 font-bold">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="aspect-video w-full bg-slate-50 text-slate-400 flex items-center justify-center font-bold text-[10px] tracking-widest rounded-lg border border-slate-200 mt-6 overflow-hidden">
                             METADATA_ANALYSIS_PENDING

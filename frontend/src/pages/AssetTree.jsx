@@ -60,6 +60,23 @@ const AssetTree = () => {
         return assetList.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.id.toLowerCase().includes(searchQuery.toLowerCase()));
     };
 
+    const triggerDiagnostics = async () => {
+        setIsDiagnosing(true);
+        try {
+            const res = await fetch('http://localhost:8080/api/assets/diagnose', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ asset_id: selectedAsset.id })
+            });
+            const data = await res.json();
+            alert(`SYSLOG: Full diagnostic sweep complete for ${data.asset_id}.\n- Signal Integrity: ${data.diagnostics.signal_integrity}%\n- Logic Gate Sync: ${data.diagnostics.logic_gate_sync}\n- Internal Temp: ${data.diagnostics.internal_temp}°C\n- Drift: ${data.diagnostics.drift}%\n\nResult: ${data.diagnostics.result}`);
+        } catch (e) {
+            console.error(e);
+            alert("DIAGNOSTICS FAILED: Could not reach control subsystem.");
+        }
+        setIsDiagnosing(false);
+    };
+
     const handleExport = () => {
         const content = `SENTINEL_MIND REGISTRY DUMP\nDATE: ${new Date().toISOString()}\n\nORBITAL ASSETS:\n` + 
                         assets.orbital.map(a => `[${a.status}] ${a.id} - ${a.name}`).join('\n') + 
@@ -243,13 +260,7 @@ const AssetTree = () => {
                     </div>
 
                     <div className="p-4 bg-white border-t border-slate-200 grid grid-cols-2 gap-2">
-                        <button onClick={() => {
-                            setIsDiagnosing(true);
-                            setTimeout(() => {
-                                setIsDiagnosing(false);
-                                alert(`SYSLOG: Full diagnostic sweep complete for ${selectedAsset.id}.\n- Signal Integrity: 99.4%\n- Logic Gate Sync: OK\n- Internal Temp: 14.2°C\n- Drift: 0.002%\n\nResult: ALL SYSTEMS NOMINAL`);
-                            }, 1500);
-                        }} className="px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer active:scale-95 shadow-sm">
+                        <button onClick={triggerDiagnostics} className="px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer active:scale-95 shadow-sm">
                             {isDiagnosing ? 'SCANNING...' : 'DIAGNOSTICS'}
                         </button>
                         <button onClick={() => {

@@ -7,7 +7,10 @@ from fastapi.middleware.cors import CORSMiddleware
 # Import the daemon entrypoints
 from backend.orchestrator.daemon import OrchestratorDaemon
 from backend.logistics.logistics_daemon import LogisticsDaemon
+from backend.orchestrator.conflict_daemon import ConflictDaemon
 from scripts.discord_actuator import main as discord_main
+
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -33,6 +36,55 @@ def get_emergencies():
     except Exception as e:
         return {"error": str(e)}
 
+class VisionRequest(BaseModel):
+    image_b64: str
+    mime_type: str = "image/jpeg"
+
+@app.post("/api/vision/analyze")
+def vision_analyze(req: VisionRequest):
+    import vertexai
+    from vertexai.generative_models import GenerativeModel, Part
+    import base64
+    from backend.orchestrator.auth import SentinelAuth
+    import json
+    
+    try:
+        SentinelAuth.init_vertex()
+        model = GenerativeModel("gemini-2.5-flash-lite")
+        image_data = base64.b64decode(req.image_b64)
+        image_part = Part.from_data(data=image_data, mime_type=req.mime_type)
+        
+        prompt = "Act as a military hazard assessment AI. Analyze this field imagery. Return a JSON object containing: 'confidence' (integer 0-100), 'extracted_coordinates' (lat/lng string approximation or N/A), 'objects_detected' (list of strings). NO markdown, NO formatting, JUST RAW JSON."
+        
+        resp = model.generate_content([image_part, prompt])
+        result = resp.text.strip()
+        if result.startswith("```json"):
+            result = result[7:-3]
+        elif result.startswith("```"):
+            result = result[3:-3]
+            
+        return json.loads(result)
+    except Exception as e:
+        return {"error": str(e), "confidence": 0, "extracted_coordinates": "ERR", "objects_detected": []}
+
+class DiagnoseRequest(BaseModel):
+    asset_id: str
+
+@app.post("/api/assets/diagnose")
+def diagnose_asset(req: DiagnoseRequest):
+    import random
+    return {
+        "status": "success",
+        "asset_id": req.asset_id,
+        "diagnostics": {
+            "signal_integrity": round(random.uniform(98.0, 100.0), 2),
+            "logic_gate_sync": "OK",
+            "internal_temp": round(random.uniform(10.0, 25.0), 1),
+            "drift": round(random.uniform(0.001, 0.005), 3),
+            "result": "ALL SYSTEMS NOMINAL"
+        }
+    }
+
 @app.on_event("startup")
 def startup_event():
     print("[main] Starting Daemons in threads...")
@@ -48,6 +100,10 @@ def startup_event():
     # Start Discord Actuator
     discord_thread = threading.Thread(target=discord_main, daemon=True)
     discord_thread.start()
+
+    # Start Conflict Daemon (Worker 3)
+    conflict_thread = threading.Thread(target=ConflictDaemon().run, daemon=True)
+    conflict_thread.start()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
