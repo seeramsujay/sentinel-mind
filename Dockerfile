@@ -3,6 +3,8 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm install
+# Copy the root .env file so Vite can find it at ../.env
+COPY .env /app/.env
 COPY frontend/ ./
 RUN npm run build
 
