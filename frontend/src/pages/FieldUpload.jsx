@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 
 const FieldUpload = () => {
-    const [progress, setProgress] = useState(64);
+    const [progress, setProgress] = useState(0);
     const [isDeploying, setIsDeploying] = useState(false);
     const [statusText, setStatusText] = useState("Awaiting cloud deployment orchestration...");
     const [previewUrl, setPreviewUrl] = useState("https://lh3.googleusercontent.com/aida-public/AB6AXuDFcfCaVGsX6cvaTIqxJJ0IrgxPniIR6C1hJuA9iqhmhCjQ99am3v01QsVGYQJo3bj8PJz0DmmY2Q9MaSizku06Z3NYg6vthdZzOMEAa1K1YSDIJFWNd2hSXITGn3c1Tj6A8hjXIaQyPNvg6mHzu5PpRVDjC_tAes0E0j1kNLRI904SRu-T84Wj2XKhBM7GvI5ZDX7U1O3cZsxnVqHgpnAaxTdTUlZtPVI7pZ6frnxoGVMb4wwTaN2FWShR-nAptMpDagKD7mzFcv8");
@@ -112,7 +112,7 @@ const FieldUpload = () => {
                         <div className="absolute bottom-12 w-full px-24">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="font-data-terminal text-[9px] text-blue-600 font-bold uppercase tracking-widest">
-                                    {isDeploying ? "Uploading Telemetry..." : "Data Cached Locally"}
+                                    {isDeploying ? "Uploading Telemetry..." : (progress === 100 ? "Deployment Complete" : "Awaiting Data Upload")}
                                 </span>
                                 <span className="font-data-terminal text-[9px] text-blue-600 font-bold">{progress}%</span>
                             </div>
@@ -181,9 +181,8 @@ const FieldUpload = () => {
                             </div>
                         </div>
 
-                        <div className="aspect-video w-full bg-slate-100 rounded-lg overflow-hidden relative border border-slate-200 mt-6 group">
-                            <img alt="Preview" className="w-full h-full object-cover grayscale transition-all group-hover:grayscale-0" src={previewUrl}/>
-                            <div className="absolute inset-0 bg-blue-500/5 crosshair pointer-events-none"></div>
+                        <div className="aspect-video w-full bg-slate-50 text-slate-400 flex items-center justify-center font-bold text-[10px] tracking-widest rounded-lg border border-slate-200 mt-6 overflow-hidden">
+                            METADATA_ANALYSIS_PENDING
                         </div>
                     </div>
 

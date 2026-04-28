@@ -10,8 +10,8 @@ function App() {
   const [selectedInc, setSelectedInc] = useState(null);
   const [command, setCommand] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  
-  const location = useLocation();
+  const [commandStatus, setCommandStatus] = useState('IDLE');
+  const [swarmMetrics, setSwarmMetrics] = useState({ cohesion: 98, latency: 14, activeAgents: 24, activeZones: 8 });
   const searchParams = new URLSearchParams(location.search);
   const urgencyFilter = searchParams.get('urgency');
 
@@ -68,9 +68,23 @@ function App() {
         }
       }
       setIsLoading(false);
+      setIsLoading(false);
     });
     
-    return () => unsubscribe();
+    // Dynamic Swarm Metrics (Simulation)
+    const interval = setInterval(() => {
+        setSwarmMetrics(prev => ({
+            cohesion: Math.max(90, Math.min(100, prev.cohesion + (Math.random() > 0.5 ? 1 : -1))),
+            latency: Math.max(8, Math.min(40, prev.latency + (Math.random() > 0.5 ? 2 : -2))),
+            activeAgents: prev.activeAgents,
+            activeZones: prev.activeZones
+        }));
+    }, 2000);
+
+    return () => {
+        unsubscribe();
+        clearInterval(interval);
+    };
   }, []);
 
   const [showLog, setShowLog] = useState(false);
@@ -82,7 +96,11 @@ function App() {
 
   const handleCommand = (e) => {
     if (e.key === 'Enter') {
-      alert(`Orchestration Command Issued: ${command}\n\nStatus: Awaiting System Triage...`);
+      setCommandStatus('TRANSMITTING...');
+      setTimeout(() => {
+          setCommandStatus('ORCHESTRATING');
+          setTimeout(() => setCommandStatus('IDLE'), 2000);
+      }, 1000);
       setCommand('');
     }
   };
@@ -223,28 +241,28 @@ function App() {
               <div>
                 <div className="flex justify-between font-data-terminal text-[10px] mb-1">
                   <span>COHESION</span>
-                  <span>98%</span>
+                  <span>{swarmMetrics.cohesion}%</span>
                 </div>
                 <div className="h-1 bg-blue-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-600 w-[98%]"></div>
+                  <div className="h-full bg-blue-600 transition-all" style={{ width: `${swarmMetrics.cohesion}%` }}></div>
                 </div>
               </div>
               <div>
                 <div className="flex justify-between font-data-terminal text-[10px] mb-1">
                   <span>LATENCY (AVG)</span>
-                  <span>14ms</span>
+                  <span>{swarmMetrics.latency}ms</span>
                 </div>
                 <div className="h-1 bg-blue-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-600 w-[14%]"></div>
+                  <div className="h-full bg-blue-600 transition-all" style={{ width: `${(swarmMetrics.latency / 40) * 100}%` }}></div>
                 </div>
               </div>
               <div className="flex gap-2 pt-2">
                 <div className="flex-1 bg-white/40 border border-white p-2 rounded">
-                  <span className="block text-[18px] font-data-mono">24</span>
+                  <span className="block text-[18px] font-data-mono">{swarmMetrics.activeAgents}</span>
                   <span className="block text-[8px] font-bold text-slate-500 uppercase tracking-tight">AGENTS</span>
                 </div>
                 <div className="flex-1 bg-white/40 border border-white p-2 rounded">
-                  <span className="block text-[18px] font-data-mono">08</span>
+                  <span className="block text-[18px] font-data-mono">0{swarmMetrics.activeZones}</span>
                   <span className="block text-[8px] font-bold text-slate-500 uppercase tracking-tight">ZONES</span>
                 </div>
               </div>
@@ -364,9 +382,10 @@ function App() {
           UPLOAD FIELD IMAGE
         </button>
         <div className="flex-1 h-12 bg-white/40 border border-brand-border rounded-xl px-4 flex items-center overflow-hidden focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
-          <span className="font-data-mono text-primary mr-2">_</span>
+          <span className={`font-data-mono mr-2 ${commandStatus !== 'IDLE' ? 'text-emerald-500 animate-pulse' : 'text-primary'}`}>{commandStatus === 'IDLE' ? '_' : '>'}</span>
           <input 
-            value={command}
+            value={commandStatus !== 'IDLE' ? commandStatus : command}
+            disabled={commandStatus !== 'IDLE'}
             onChange={(e) => setCommand(e.target.value)}
             onKeyDown={handleCommand}
             className="bg-transparent border-none outline-none w-full font-data-mono text-sm text-slate-800 placeholder-slate-400 uppercase tracking-wider" 

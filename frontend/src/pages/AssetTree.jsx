@@ -23,6 +23,10 @@ const AssetTree = () => {
     });
 
     const [command, setCommand] = useState('');
+    const [commandStatus, setCommandStatus] = useState('IDLE');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isDiagnosing, setIsDiagnosing] = useState(false);
+    const [isDeployingResource, setIsDeployingResource] = useState(false);
 
     const toggle = (section) => {
         setExpanded(prev => ({ ...prev, [section]: !prev[section] }));
@@ -30,7 +34,11 @@ const AssetTree = () => {
 
     const handleCommand = (e) => {
         if (e.key === 'Enter') {
-            alert(`Orchestration Command Issued: ${command}\n\nStatus: Scanning selected asset ${selectedAsset.id}...`);
+            setCommandStatus('TRANSMITTING...');
+            setTimeout(() => {
+                setCommandStatus('ORCHESTRATING');
+                setTimeout(() => setCommandStatus('IDLE'), 2000);
+            }, 1000);
             setCommand('');
         }
     };
@@ -47,8 +55,26 @@ const AssetTree = () => {
         ]
     };
 
-    const navigateToUpload = () => {
-        window.location.href = "/upload";
+    const flattenFilter = (assetList) => {
+        if (!searchQuery) return assetList;
+        return assetList.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.id.toLowerCase().includes(searchQuery.toLowerCase()));
+    };
+
+    const handleExport = () => {
+        const content = `SENTINEL_MIND REGISTRY DUMP\nDATE: ${new Date().toISOString()}\n\nORBITAL ASSETS:\n` + 
+                        assets.orbital.map(a => `[${a.status}] ${a.id} - ${a.name}`).join('\n') + 
+                        `\n\nGROUND STATIONS:\n` + 
+                        assets.ground.map(a => `[${a.status}] ${a.id} - ${a.name}`).join('\n');
+        const blob = new Blob([content], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Registry_${Date.now()}.txt`;
+        link.click();
+    };
+
+    const triggerDeploy = () => {
+        setIsDeployingResource(true);
+        setTimeout(() => setIsDeployingResource(false), 3000);
     };
 
     return (
@@ -67,7 +93,8 @@ const AssetTree = () => {
                         <div className="relative flex-1 group">
                             <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors text-[20px]">search</span>
                             <input 
-                                onKeyDown={(e) => e.key === 'Enter' && alert(`Deep-search initiated for asset: ${e.target.value}`)}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-11 pr-4 py-2 border border-slate-200 rounded-xl bg-white text-slate-800 focus:ring-1 focus:ring-black focus:border-black outline-none transition-all shadow-sm placeholder:text-slate-400 text-sm" 
                                 placeholder="Search Satellite ID, Ground Station, or Fleet Tag..." 
                                 type="text"
@@ -79,7 +106,7 @@ const AssetTree = () => {
                                 <span className="material-symbols-outlined text-[18px]">filter_list</span>
                                 FILTERS
                             </button>
-                            <button onClick={() => alert('Exporting Asset Registry')} className="p-2 h-10 w-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all cursor-pointer shadow-sm hover:shadow active:scale-95">
+                            <button onClick={handleExport} className="p-2 h-10 w-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all cursor-pointer shadow-sm hover:shadow active:scale-95">
                                 <span className="material-symbols-outlined text-[20px]">ios_share</span>
                             </button>
                         </div>
@@ -93,7 +120,7 @@ const AssetTree = () => {
                                 <span className="font-bold text-[15px]">Orbital Fleet [O-NET]</span>
                                 <span className="ml-auto font-mono text-[11px] text-slate-500">4/4 ACTIVE</span>
                             </div>
-                            {expanded.orbital && assets.orbital.map(asset => (
+                            {expanded.orbital && flattenFilter(assets.orbital).map(asset => (
                                 <div 
                                     key={asset.id}
                                     onClick={() => setSelectedAsset({
@@ -126,7 +153,7 @@ const AssetTree = () => {
                                 <span className="material-symbols-outlined text-blue-600">cell_tower</span>
                                 <span className="font-bold text-[15px]">Ground Stations [G-BASE]</span>
                             </div>
-                            {expanded.ground && assets.ground.map(asset => (
+                            {expanded.ground && flattenFilter(assets.ground).map(asset => (
                                 <div 
                                     key={asset.id}
                                     onClick={() => setSelectedAsset({
@@ -217,24 +244,34 @@ const AssetTree = () => {
 
                     <div className="p-4 bg-white border-t border-slate-200 grid grid-cols-2 gap-2">
                         <button onClick={() => {
-                            console.log(`[ORCHESTRATOR] Running full diagnostics on ${selectedAsset.id}...`);
-                            alert(`SYSLOG: Full diagnostic sweep complete for ${selectedAsset.id}.\n- Signal Integrity: 99.4%\n- Logic Gate Sync: OK\n- Internal Temp: 14.2°C\n- Drift: 0.002%\n\nResult: ALL SYSTEMS NOMINAL`);
-                        }} className="px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer active:scale-95 shadow-sm">DIAGNOSTICS</button>
-                        <button onClick={() => alert(`ATTENTION: Override signal sent to ${selectedAsset.id}. Manual control established over telemetry node ${selectedAsset.id.split('-')[1]}.`)} className="px-4 py-2 bg-blue-600 text-white rounded font-bold text-[12px] hover:bg-blue-700 transition-all cursor-pointer shadow-md active:scale-95">OVERRIDE</button>
+                            setIsDiagnosing(true);
+                            setTimeout(() => {
+                                setIsDiagnosing(false);
+                                alert(`SYSLOG: Full diagnostic sweep complete for ${selectedAsset.id}.\n- Signal Integrity: 99.4%\n- Logic Gate Sync: OK\n- Internal Temp: 14.2°C\n- Drift: 0.002%\n\nResult: ALL SYSTEMS NOMINAL`);
+                            }, 1500);
+                        }} className="px-4 py-2 bg-white border border-slate-200 rounded font-bold text-[12px] text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer active:scale-95 shadow-sm">
+                            {isDiagnosing ? 'SCANNING...' : 'DIAGNOSTICS'}
+                        </button>
+                        <button onClick={() => {
+                            alert(`ATTENTION: Override signal sent to ${selectedAsset.id}. Manual control established over telemetry node ${selectedAsset.id.split('-')[1]}.`);
+                        }} className="px-4 py-2 bg-blue-600 text-white rounded font-bold text-[12px] hover:bg-blue-700 transition-all cursor-pointer shadow-md active:scale-95 border border-transparent">
+                            OVERRIDE
+                        </button>
                     </div>
                 </aside>
             </main>
             
             {/* Standardized Command Bar */}
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-5xl h-20 frosted border border-white/60 rounded-2xl shadow-2xl z-[100] flex items-center px-6 gap-6">
-                <button onClick={navigateToUpload} className="h-12 bg-primary text-white text-[12px] font-bold px-6 rounded-xl flex items-center gap-3 hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 whitespace-nowrap">
-                    <span className="material-symbols-outlined">cloud_upload</span>
-                    RESOURCE DEPLOY
+                <button onClick={triggerDeploy} className="h-12 bg-primary text-white text-[12px] font-bold px-6 rounded-xl flex items-center gap-3 hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 whitespace-nowrap">
+                    <span className={`material-symbols-outlined ${isDeployingResource ? 'animate-spin' : ''}`}>sync</span>
+                    {isDeployingResource ? 'DEPLOYING...' : 'RESOURCE DEPLOY'}
                 </button>
                 <div className="flex-1 h-12 bg-white/40 border border-brand-border rounded-xl px-4 flex items-center overflow-hidden focus-within:ring-1 focus-within:ring-primary">
-                    <span className="font-data-mono text-primary mr-2">_</span>
+                    <span className={`font-data-mono mr-2 ${commandStatus !== 'IDLE' ? 'text-emerald-500 animate-pulse' : 'text-primary'}`}>{commandStatus === 'IDLE' ? '_' : '>'}</span>
                     <input 
-                        value={command}
+                        value={commandStatus !== 'IDLE' ? commandStatus : command}
+                        disabled={commandStatus !== 'IDLE'}
                         onChange={(e) => setCommand(e.target.value)}
                         onKeyDown={handleCommand}
                         className="bg-transparent border-none outline-none w-full font-data-mono text-sm text-slate-800 placeholder-slate-400 uppercase tracking-wider" 
