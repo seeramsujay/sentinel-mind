@@ -1,6 +1,7 @@
 import time
 import json
-from .auth import SentinelAuth
+import sys
+from .auth import SentinelAuth, SentinelEncoder
 from vertexai.generative_models import GenerativeModel
 
 class ConflictDaemon:
@@ -28,7 +29,7 @@ class ConflictDaemon:
         Multiple disasters have been assigned the same response unit: {unit_id}.
         
         Disasters competing for this unit:
-        {json.dumps(payload, indent=2)}
+        {json.dumps(payload, indent=2, cls=SentinelEncoder)}
         
         Analyze the urgency, hazard_type, and assess prioritizing the most critical one.
         Return ONLY the string ID of the emergency that should KEEP the resource. No other text.
@@ -53,7 +54,7 @@ class ConflictDaemon:
             print(f"Conflict resolution failed: {e}")
 
     def run(self):
-        print("[main] Worker 3 (Conflict AI) Active. Scanning for double-bookings...")
+        print("[main] Worker 3 (Conflict AI) Active. Scanning for double-bookings...", flush=True)
         
         while True:
             try:
@@ -76,7 +77,7 @@ class ConflictDaemon:
                         
                 time.sleep(5)
             except Exception as e:
-                print(f"Conflict Daemon Error: {e}")
+                print(f"Conflict Daemon Error: {e}", flush=True)
                 time.sleep(5)
 
 if __name__ == "__main__":

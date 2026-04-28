@@ -24,3 +24,19 @@ class SentinelAuth:
         location = os.getenv("GCP_REGION", "us-central1")
         if project:
             vertexai.init(project=project, location=location)
+
+import json
+from datetime import datetime
+
+class SentinelEncoder(json.JSONEncoder):
+    """Custom JSON encoder for Firestore types."""
+    def default(self, obj):
+        try:
+            # Handle Firestore Timestamps and Python Datetimes
+            if hasattr(obj, 'isoformat'):
+                return obj.isoformat()
+            if isinstance(obj, bytes):
+                return obj.decode('utf-8', errors='ignore')
+            return str(obj)
+        except:
+            return super().default(obj)

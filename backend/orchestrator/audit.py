@@ -24,9 +24,10 @@ class GovernanceAudit:
             print(f"[GovernanceAudit] Failed to log audit: {e}")
 
     @staticmethod
-    def log_hitl_flag(emergency_id, reasoning):
+    def log_hitl_flag(emergency_id, reasoning, db=None):
         """Logs a mandatory human-in-the-loop safety override."""
-        db = SentinelAuth.get_firestore()
+        if db is None:
+            db = SentinelAuth.get_firestore()
         doc_ref = db.collection('emergencies').document(emergency_id)
         try:
             doc_ref.update({

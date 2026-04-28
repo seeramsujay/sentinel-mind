@@ -1,7 +1,7 @@
 import json
 import os
 from vertexai.generative_models import GenerativeModel
-from .auth import SentinelAuth
+from .auth import SentinelAuth, SentinelEncoder
 
 
 class ConflictResolver:
@@ -50,7 +50,7 @@ If no unit is available for a P1, set action to "wait"."""
             ]
         }
 
-        user_prompt = f"Conflicting emergencies:\n{json.dumps(payload['conflicts'], indent=2)}\n\nAvailable resources:\n{json.dumps(payload['resources'], indent=2)}"
+        user_prompt = f"Conflicting emergencies:\n{json.dumps(payload['conflicts'], indent=2, cls=SentinelEncoder)}\n\nAvailable resources:\n{json.dumps(payload['resources'], indent=2, cls=SentinelEncoder)}"
 
         try:
             response = self.model.generate_content([self._system_prompt, user_prompt])
