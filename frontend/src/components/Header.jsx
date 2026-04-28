@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path) => location.pathname === path;
 
@@ -28,9 +29,12 @@ const Header = () => {
             <span className="font-bold text-[12px] uppercase">OPERATIONAL</span>
           </div>
           <div className="flex gap-2">
-            <span onClick={() => alert('Viewing 2 Critical Alerts')} className="cursor-pointer bg-error/10 text-error font-bold text-[10px] px-2 py-0.5 rounded border border-error/20 hover:bg-error/20 transition-colors">2 CRITICAL</span>
-            <span onClick={() => alert('Viewing 5 High Priority Alerts')} className="cursor-pointer bg-orange-100 text-orange-800 font-bold text-[10px] px-2 py-0.5 rounded border border-orange-200 hover:bg-orange-200 transition-colors">5 HIGH</span>
-            <span onClick={() => alert('Viewing 12 Medium Priority Alerts')} className="cursor-pointer bg-slate-100 text-slate-600 font-bold text-[10px] px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200 transition-colors">12 MED</span>
+            <span onClick={() => navigate('/dashboard?urgency=P1')} className="cursor-pointer bg-error/10 text-error font-bold text-[10px] px-2 py-0.5 rounded border border-error/20 hover:bg-error/20 transition-colors">2 CRITICAL</span>
+            <span onClick={() => navigate('/dashboard?urgency=P2')} className="cursor-pointer bg-orange-100 text-orange-800 font-bold text-[10px] px-2 py-0.5 rounded border border-orange-200 hover:bg-orange-200 transition-colors">5 HIGH</span>
+            <span onClick={() => navigate('/dashboard?urgency=P3')} className="cursor-pointer bg-slate-100 text-slate-600 font-bold text-[10px] px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200 transition-colors">12 MED</span>
+            {location.search.includes('urgency') && (
+              <span onClick={() => navigate('/dashboard')} className="cursor-pointer bg-slate-800 text-white font-bold text-[10px] px-2 py-0.5 rounded border border-slate-700 hover:bg-slate-700 transition-colors">CLEAR FILTER</span>
+            )}
           </div>
         </div>
       </div>

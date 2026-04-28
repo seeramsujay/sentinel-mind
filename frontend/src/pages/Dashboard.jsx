@@ -1,29 +1,42 @@
 import React, { useState, useEffect } from 'react';
+import { GoogleMap, useJsApiLoader, OverlayViewF } from '@react-google-maps/api';
+import { collection, onSnapshot, query, limit } from 'firebase/firestore';
+import { db } from '../firebase';
+import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 
 function App() {
   const [emergencies, setEmergencies] = useState([]);
   const [selectedInc, setSelectedInc] = useState(null);
   const [command, setCommand] = useState('');
+  
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const urgencyFilter = searchParams.get('urgency');
+
+  const filteredEmergencies = urgencyFilter 
+    ? emergencies.filter(e => e.urgency === urgencyFilter)
+    : emergencies;
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
+  });
 
   useEffect(() => {
-    const fetchEmergencies = async () => {
-      try {
-        const res = await fetch('http://localhost:8080/emergencies');
-        const data = await res.json();
-        setEmergencies(data);
-        if (data.length > 0 && !selectedInc) {
-          setSelectedInc(data[0]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch emergencies", err);
+    const q = query(collection(db, 'emergencies'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setEmergencies(data);
+      if (data.length > 0) {
+        setSelectedInc(prev => prev || data[0]);
       }
-    };
+    }, (error) => {
+      console.error("Firebase Snapshot Error:", error);
+    });
     
-    fetchEmergencies();
-    const interval = setInterval(fetchEmergencies, 5000);
-    return () => clearInterval(interval);
-  }, [selectedInc]);
+    return () => unsubscribe();
+  }, []);
 
   const [showLog, setShowLog] = useState(false);
 
@@ -58,7 +71,7 @@ function App() {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto p-3 font-data-terminal text-[12px] terminal-scroll space-y-3 custom-scrollbar">
-            {emergencies.map((e, idx) => (
+            {filteredEmergencies.map((e, idx) => (
               <div 
                 key={e.id || idx} 
                 onClick={() => setSelectedInc(e)}
@@ -81,48 +94,42 @@ function App() {
 
         {/* Center Panel: Tactical Grid remains same */}
         <section className="flex-1 relative bg-[#E8EFF9] overflow-hidden">
-          {/* Tactical Grid Overlay */}
-          <div className="absolute inset-0 opacity-40">
-            <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <pattern height="40" id="grid" patternUnits="userSpaceOnUse" width="40">
-                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#A9C0E4" strokeWidth="0.5"></path>
-                </pattern>
-              </defs>
-              <rect fill="url(#grid)" height="100%" width="100%"></rect>
-            </svg>
-          </div>
+          {isLoaded && (
+            <GoogleMap
+              mapContainerStyle={{ width: '100%', height: '100%' }}
+              center={{ lat: 20.5937, lng: 78.9629 }}
+              zoom={5}
+              options={{ disableDefaultUI: true }}
+            >
+              {filteredEmergencies.map((e, idx) => {
+                const lon = Number(e.location_coordinates?.lng || e.location?.lng || e.location?.longitude);
+                const lat = Number(e.location_coordinates?.lat || e.location?.lat || e.location?.latitude);
+                if (isNaN(lon) || isNaN(lat)) return null;
 
-          <div className="relative w-full h-full z-10">
-             {emergencies.map((e, idx) => {
-               const lon = e.location_coordinates?.lng || e.location?.lng || e.location?.longitude;
-               const lat = e.location_coordinates?.lat || e.location?.lat || e.location?.latitude;
-               const x = lon ? ((lon + 180) / 360) * 100 : (20 + (idx * 15) % 60);
-               const y = lat ? ((90 - lat) / 180) * 100 : (30 + (idx * 20) % 50);
-
-               return (
-                 <div 
-                   key={e.id || idx} 
-                   style={{ 
-                     position: 'absolute', 
-                     left: `${x}%`, 
-                     top: `${y}%`,
-                     transform: 'translate(-50%, -50%)'
-                   }}
-                   className="group cursor-pointer"
-                   onClick={() => setSelectedInc(e)}
-                 >
-                   <div className="relative flex items-center justify-center">
-                      <div className={`absolute w-14 h-14 rounded-full pulsing ${e.urgency === 'P1' ? 'bg-red-500/20' : 'bg-blue-500/10'}`}></div>
-                      <div className={`w-3.5 h-3.5 rounded-full border-2 border-white shadow-lg transition-transform group-hover:scale-125 ${e.urgency === 'P1' ? 'bg-error' : 'bg-blue-600'}`}></div>
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm border border-brand-border whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                        <span className="font-bold text-[10px] uppercase text-slate-900">{e.hazard_type}</span>
+                return (
+                  <OverlayViewF
+                    position={{ lat, lng: lon }}
+                    mapPaneName={OverlayViewF.OVERLAY_MOUSE_TARGET}
+                    key={e.id || idx}
+                  >
+                    <div 
+                      style={{ transform: 'translate(-50%, -50%)' }}
+                      className="group cursor-pointer"
+                      onClick={() => setSelectedInc(e)}
+                    >
+                      <div className="relative flex items-center justify-center">
+                         <div className={`absolute w-14 h-14 rounded-full pulsing ${e.urgency === 'P1' ? 'bg-red-500/20' : 'bg-blue-500/10'}`}></div>
+                         <div className={`w-3.5 h-3.5 rounded-full border-2 border-white shadow-lg transition-transform group-hover:scale-125 ${e.urgency === 'P1' ? 'bg-error' : 'bg-blue-600'}`}></div>
+                         <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm border border-brand-border whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                           <span className="font-bold text-[10px] uppercase text-slate-900">{e.hazard_type}</span>
+                         </div>
                       </div>
-                   </div>
-                 </div>
-               );
-             })}
-          </div>
+                    </div>
+                  </OverlayViewF>
+                );
+              })}
+            </GoogleMap>
+          )}
 
           {/* Frosted Glass Overlay: Swarm Status */}
           <div className="absolute top-6 left-6 frosted p-4 border border-white/50 rounded-xl shadow-lg w-64 z-40">
@@ -189,7 +196,7 @@ function App() {
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="p-4 border-b border-brand-border bg-white flex items-center justify-between">
               <h2 className="font-bold text-[12px] uppercase">RAG SitReps</h2>
-              <span className="text-[10px] font-data-mono text-slate-400">Total: {emergencies.length}</span>
+              <span className="text-[10px] font-data-mono text-slate-400">Total: {filteredEmergencies.length}</span>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
               {selectedInc ? (
@@ -243,7 +250,7 @@ function App() {
                    <span className="text-[12px] font-bold uppercase tracking-widest">Select Incident</span>
                 </div>
               )}
-              {emergencies.filter(e => e.id !== selectedInc?.id).slice(0, 10).map((e, idx) => (
+              {filteredEmergencies.filter(e => e.id !== selectedInc?.id).slice(0, 10).map((e, idx) => (
                 <div key={idx} onClick={() => setSelectedInc(e)} className="p-3 border border-brand-border rounded-xl bg-white shadow-sm hover:border-primary/30 transition-all cursor-pointer group">
                   <div className="flex justify-between items-start mb-2">
                     <span className={`text-[9px] px-2 py-0.5 rounded font-bold border ${e.urgency === 'P1' ? 'bg-red-50 text-error border-red-50' : 'bg-slate-50 text-slate-400 border-slate-100'} uppercase`}>
