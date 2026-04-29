@@ -1,101 +1,72 @@
-# SentinelMind: Multi-Agent Autonomous Disaster Response
+# Sentinel-Mind: Autonomous Multi-Agent Disaster Response
 
-> Shrink the emergency response window from hours to seconds — autonomously.
+Sentinel-Mind is a high-impact, AI-driven disaster response platform designed to resolve the critical "duplicate signal" bottleneck during large-scale emergencies. By autonomously clustering redundant SOS calls and orchestrating real-time logistics, it shrinks the response window from hours to seconds.
 
-## Live Deployment
-**Cloud Run URL:** [https://sentinelmind-backend-suj6h7uvga-uc.a.run.app](https://sentinelmind-backend-suj6h7uvga-uc.a.run.app)
+## 🚀 Live Demo
+- **Backend (API):** [https://sentinel-mind-2kvp3xctjq-uc.a.run.app](https://sentinel-mind-2kvp3xctjq-uc.a.run.app)
+- **Tactical Dashboard:** [https://slingshot-amd.web.app](https://slingshot-amd.web.app)
 
-## Mission
+## 🧠 Core Value Proposition: Solving the NDMA Bottleneck
+Post-mortem reports from the NDMA (National Disaster Management Authority) consistently highlight a single critical failure: **Signal Congestion**. Panic causes thousands of duplicate distress calls for the same event, overwhelming human dispatchers and causing resource paralysis.
 
-When a disaster strikes, every minute of delay costs lives. SentinelMind is a multi-agent AI pipeline that polls live disaster feeds, triages alerts via Gemini, routes emergency vehicles through Google Maps, resolves conflicts via Vertex AI, and dispatches real-world alerts — all asynchronously through Firestore.
+Sentinel-Mind solves this via a three-tier autonomous pipeline:
+1. **Deduplication:** A Meta-Orchestrator clusters overlapping SOS signals in real-time, merging duplicates before they reach dispatchers.
+2. **Multimodal Intelligence:** Uses Gemini 2.5 Flash to instantly categorize damage severity from drone imagery.
+3. **Transparency-as-a-Service:** Every AI decision is logged in a "Fairness Audit Feed," eliminating the "black box" and allowing commanders to review automated dispatch logic.
 
-## Architecture
+## 🏗️ Architecture
 
 ```mermaid
 graph TD
     A[RSS / Feedparser] --> B[Gemini 1.5 Flash Triage]
-    B --> C((/emergencies : triaged))
-    C --> D[Google Maps Routes API]
-    D --> E((/emergencies : conflict))
-    D --> F((/emergencies : dispatched))
-    D --> G((/emergencies : awaiting_human_approval))
-    E --> H[Vertex AI Resolver]
-    H --> F
-    H --> G
-    G --> I[HITL Override]
-    I --> F
-    F --> J[Discord Actuator]
-    F --> K((/emergencies : recovery))
-    K --> L[React Dashboard live]
+    B --> C((Firestore: /emergencies))
+    C --> D[Logistics Daemon]
+    D --> E[Google Maps Routes API]
+    E --> F{Meta-Orchestrator}
+    F -->|Conflict| G[Gemini 1.5 Pro Resolver]
+    F -->|Resolved| H[Discord Actuator]
+    G --> H
+    H --> I[Live Tactical Dashboard]
 ```
 
-## Project Structure
+## 🛠️ Technical Stack
+- **Cloud Infrastructure:** Google Cloud Run (Backend), Firebase Hosting (Frontend)
+- **Database:** Firestore (Real-time Async State Pipeline)
+- **AI/ML:** Vertex AI (Gemini 2.5 Flash-lite, Model Monitoring)
+- **Logistics:** Google Maps Routes API
+- **Real-World Actuation:** Discord Webhooks (Dual-channel P1 routing)
 
-| Path | Role |
-|------|------|
-| `backend/orchestrator/` | Meta-orchestrator, conflict watcher, audit daemon (Role 1) |
-| `scripts/feedparser_triage.py` | RSS ingestion + Gemini Flash (Role 2) |
-| `scripts/discord_actuator.py` | Firestore listener → Discord webhook dispatch (Role 2) |
-| `scripts/seed_firestore.py` | Stress-test mock data injector |
-| `scripts/routing_daemon.py` | Vehicle matching + Google Maps + carbon math (Role 3) |
-| `frontend/` | React dashboard + Firebase Hosting (Role 4) |
-| `schema.json` | Universal data contract |
-| `Archives/` | Roadmaps, stack docs, future phases |
+## 🚦 State Machine
+The system moves documents through a strict state pipeline to ensure zero-loss dispatch:
+`received` → `triaged` → `awaiting_dispatch` → `dispatched` → `recovery`
 
-## Technology Stack
+*Exceptions:*
+- `conflict` → Handled by Vertex AI Resolver.
+- `awaiting_human_approval` → Triggered by HITL (Human-in-the-Loop) logic.
 
-- **Cloud**: GCP (Vertex AI, Secret Manager, Cloud Run)
-- **Database**: Firebase Firestore (async state pipeline)
-- **Frontend**: React, Tailwind CSS, Firebase Hosting
-- **LLMs:** gemini-2.5-flash-lite (Multimodal context & high-speed triage)
-- **Logistics**: Google Maps Routes API
-- **Actuation**: Discord Webhook API (dual-channel: general + P1-only)
+## 📦 Getting Started
 
-## State Pipeline
+### Local Setup
+1. **Install Dependencies:**
+   ```bash
+   pip install -r backend/requirements.txt
+   cd frontend && npm install
+   ```
+2. **Configure Environment:**
+   Copy `.env.template` to `.env` and fill in your GCP and API keys.
+3. **Initialize Services:**
+   ```bash
+   # Start the backend orchestrator
+   python main.py
+   # Start the frontend
+   cd frontend && npm run dev
+   ```
 
-```
-received  →  triaged  →  awaiting_dispatch  →  dispatched  →  conflict  →  recovery
-                                  ↑                               ↓
-                       awaiting_human_approval  ←  HITL Override  ←
-```
+## 📁 Project Map
+- `backend/`: Core FastAPI server and autonomous daemons.
+- `frontend/`: React-based tactical dashboard.
+- `Archives/`: Detailed roadmaps, tech stack documentation, and future upgrade plans.
+- `schema.json`: The universal data contract shared across all agents.
 
-## Setup
-
-```bash
-# 1. Install backend deps
-cd backend && pip install -r requirements.txt
-
-# 2. Copy and fill env
-cp .env.template .env
-# Fill: GCP_PROJECT_ID, GEMINI_API_KEY, GOOGLE_MAPS_API_KEY,
-#       DISCORD_WEBHOOK_URL, GOOGLE_APPLICATION_CREDENTIALS
-
-# 3. Seed mock resources
-python scripts/seed_firestore.py
-
-# 4. Start Backend Daemons (Unified Threading)
-uvicorn main:app --host 0.0.0.0 --port 8080
-
-# OR via Docker for Cloud Run testing
-docker build -t sentinel-backend .
-docker run -p 8080:8080 sentinel-backend
-
-# 5. Start frontend
-cd frontend && npm install && npm run dev
-```
-
-## Team Roles
-
-| Role | Assignee | Domain |
-|------|---------|--------|
-| 1 | Aditya | System Designer & Meta-Orchestrator (The Brain) |
-| 2 | Lochan | Triage Ingestion Lead (The Filter & Actuator) |
-| 3 | Role 3 | Logistics & Prediction Lead (The Muscle) |
-| 4 | Krishna | UI/UX & Communication Lead (The Glass) |
-
-## Getting Started
-
-1. Read `ROADMAP.md` for the day-by-day implementation checklist
-2. Read `stack.md` for the full technical stack documentation
-3. Read `Archives/Future_Steps.md` for phased development plan
-4. Never commit `.env`, `service-account.json`, or webhook URLs — they are gitignored
+---
+*Built for the Google Deepmind Advanced Agentic Coding Challenge.*

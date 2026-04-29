@@ -46,3 +46,6 @@ Thumbs.db
 
 # Agent artifacts
 .agent/
+
+# Editor specific
+.obsidian/

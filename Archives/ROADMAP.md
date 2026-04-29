@@ -52,7 +52,7 @@ Before anyone codes, the team must finalize the JSON Schema and state pipeline. 
 
 ### All Hands: April 28 (Submission Evening)
 Dev work is strictly forbidden today.
-1. [ ] **The Golden Path:** Run a perfectly executed crisis simulation on the live app.
-2. [ ] **Record the Demo:** Do not edit fancy transitions. Show the mobile UI, show the Discord embed ping hitting the alert channel, click the "HITL Override" button, and highlight the SDG live trackers. Let the complex async code speak for itself.
+1. [x] **The Golden Path:** Run a perfectly executed crisis simulation on the live app.
+2. [x] **Record the Demo:** Do not edit fancy transitions. Show the mobile UI, show the Discord embed ping hitting the alert channel, click the "HITL Override" button, and highlight the SDG live trackers. Let the complex async code speak for itself.
 3. [x] **Clean the Repo:** Clean up the GitHub README, ensure no `.env` files or API keys are public, and attach your architecture diagram.
 4. [ ] **Submit:** Hit submit on the portal.
