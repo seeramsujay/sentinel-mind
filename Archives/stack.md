@@ -10,7 +10,7 @@ Here are the completely updated technical stack markdown files, integrating the 
 **System Domain:** "The Brain" & Bias Shield
 
 ## 1. Technical Stack
-* **Cloud Infrastructure:** Google Cloud Platform (GCP).
+* **Cloud Infrastructure:** Google Cloud Run (Unified Frontend/Backend).
 * **Orchestration Engine:** Vertex AI Agent Builder.
 * **Monitoring & Governance:** Vertex AI Model Monitoring.
 * **Core APIs (Admin):** Gemini APIs, Google Maps Routes API, Firestore API.
@@ -49,14 +49,14 @@ Here are the completely updated technical stack markdown files, integrating the 
 * **UI Library:** MUI or Tailwind (Landscape-only Command Center layout).
 * [cite_start]**Mapping Library:** `@react-google-maps/api`[cite: 228].
 * [cite_start]**State Management:** Native Firebase `onSnapshot()` listeners inside `useEffect` hooks[cite: 228].
-* [cite_start]**Deployment:** Firebase Hosting[cite: 229].
+* [cite_start]**Deployment:** Unified FastAPI on Cloud Run[cite: 229].
 
 ## 2. Technical Documentation & Responsibilities
 
 ### UI Architecture & Constraints
 * [cite_start]Build a fast, production-grade React Web dashboard designed strictly as a real-time Enterprise Command Center[cite: 227, 240].
 * **CRITICAL CONSTRAINT:** Do not use polling loops. [cite_start]You must use native Firebase `onSnapshot()` listeners inside `useEffect` hooks to listen to Firestore state changes[cite: 228]. [cite_start]This ensures live asynchronous updates instantly without page reloads[cite: 241].
-* [cite_start]Deploy the application globally via Firebase Hosting[cite: 229, 241].
+* [cite_start]Deploy the application unified via Cloud Run[cite: 229, 241].
 
 ### Visual Mapping & Dashboards
 * [cite_start]Connect the `@react-google-maps/api` library to dynamically render live disaster coordinates and polyline emergency routes mapped by Role 3[cite: 228].

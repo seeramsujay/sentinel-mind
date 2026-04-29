@@ -3,8 +3,8 @@
 Sentinel-Mind is a high-impact, AI-driven disaster response platform designed to resolve the critical "duplicate signal" bottleneck during large-scale emergencies. By autonomously clustering redundant SOS calls and orchestrating real-time logistics, it shrinks the response window from hours to seconds.
 
 ## 🚀 Live Demo
-- **Backend (API):** [https://sentinel-mind-2kvp3xctjq-uc.a.run.app](https://sentinel-mind-2kvp3xctjq-uc.a.run.app)
-- **Tactical Dashboard:** [https://slingshot-amd.web.app](https://slingshot-amd.web.app)
+- **Unified Command Center:** [https://sentinel-mind-2kvp3xctjq-uc.a.run.app](https://sentinel-mind-2kvp3xctjq-uc.a.run.app)
+  *(Frontend + Backend unified via FastAPI on Google Cloud Run)*
 
 ## 🧠 Core Value Proposition: Solving the NDMA Bottleneck
 Post-mortem reports from the NDMA (National Disaster Management Authority) consistently highlight a single critical failure: **Signal Congestion**. Panic causes thousands of duplicate distress calls for the same event, overwhelming human dispatchers and causing resource paralysis.
@@ -30,7 +30,7 @@ graph TD
 ```
 
 ## 🛠️ Technical Stack
-- **Cloud Infrastructure:** Google Cloud Run (Backend), Firebase Hosting (Frontend)
+- **Cloud Infrastructure:** Google Cloud Run (Unified Frontend & Backend)
 - **Database:** Firestore (Real-time Async State Pipeline)
 - **AI/ML:** Vertex AI (Gemini 2.5 Flash-lite, Model Monitoring)
 - **Logistics:** Google Maps Routes API

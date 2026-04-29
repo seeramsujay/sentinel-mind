@@ -4,7 +4,7 @@
 **Speaker:** "Welcome to Sentinel-Mind, an AI-driven, real-time emergency management and logistics orchestration platform. During a crisis, seconds matter. Sentinel-Mind ingests live data, coordinates rescue assets autonomously, and most importantly, resolves the duplicate distress signal issue highlighted by recent NDMA post-mortem reports. Let's see it in action."
 ## 2. Accessing the Platform (0:30 - 1:00)
 **Action:** Open the browser and navigate to the live deployment URL.
-**Speaker:** "Our frontend is lightning-fast and globally distributed via Firebase Hosting, while our heavy-duty AI processing and Meta-Orchestrator run securely on the backend. As we log in, we are greeted by the Global Tactical Grid."
+**Speaker:** "Our platform is unified on Google Cloud Run for high performance, serving our high-fidelity React frontend and Meta-Orchestrator from a single, resilient node. As we log in, we are greeted by the Global Tactical Grid."
 ## 3. The Global Tactical Grid (1:00 - 1:45)
 **Action:** Pan and zoom around the Google Map interface in the center panel.
 **Speaker:** "At the core is our interactive tactical grid, powered by Google Maps. Here, you can see live incidents pulsing on the map. 
@@ -21,4 +21,4 @@ The UI is designed to be glassmorphic and distraction-free, ensuring commanders 
 **Action:** Direct attention to the right sidebar. Expand the 'System Audit Log' (arrow icon) on the selected incident.
 **Speaker:** "With AI making critical dispatch decisions, trust is paramount. On the right, we have our Transparency-as-a-Service Panel—also serving as our Fairness Audit Feed. It eliminates the black-box problem. By expanding these logs, commanders see the exact logic, confidence scores, and NDMA protocols the AI used to make its decisions."
 ## 7. Conclusion (4:00 - 4:30)
-**Speaker:** "In summary, Sentinel-Mind combines Firebase Hosting, Gemini 2.5 Multimodal intelligence, and real-time mapping to turn chaotic duplicate signals into coordinated, transparent, life-saving action. Thank you."
+**Speaker:** "In summary, Sentinel-Mind combines Cloud Run scalability, Gemini 2.5 Multimodal intelligence, and real-time mapping to turn chaotic duplicate signals into coordinated, transparent, life-saving action. Thank you."
