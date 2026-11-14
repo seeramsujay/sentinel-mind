@@ -2,11 +2,13 @@ import sys
 import types
 from unittest.mock import MagicMock
 
+
 def make_mock_pkg(name):
     m = types.ModuleType(name)
     m.__path__ = []
     sys.modules[name] = m
     return m
+
 
 for pkg in ["firebase_admin", "google", "google.cloud", "vertexai"]:
     if pkg not in sys.modules:

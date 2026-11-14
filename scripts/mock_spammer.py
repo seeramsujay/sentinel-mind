@@ -14,19 +14,18 @@ Prerequisites:
     service-account.json in the project root (or path set in .env).
 """
 
-import os
-import sys
-import math
-import uuid
-import time
 import json
 import logging
-import datetime
+import math
+import os
+import sys
+import time
+import uuid
 
-from dotenv import load_dotenv
 import firebase_admin
+from dotenv import load_dotenv
 from firebase_admin import credentials, firestore
-import google.genai as genai
+from google import genai
 from google.genai import types
 
 # ---------------------------------------------------------------------------
@@ -36,11 +35,13 @@ from google.genai import types
 load_dotenv()  # Pull GEMINI_API_KEY + GOOGLE_APPLICATION_CREDENTIALS from .env
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-SERVICE_ACCOUNT_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "service-account.json")
+SERVICE_ACCOUNT_PATH = os.getenv(
+    "GOOGLE_APPLICATION_CREDENTIALS", "service-account.json"
+)
 
-TOTAL_EMERGENCIES = 50          # Total documents to generate and push
-FIRESTORE_BATCH_SIZE = 10       # Firestore recommends ≤500 writes/batch; 10 keeps us safe
-INTER_BATCH_SLEEP_SEC = 1.5     # Pause between Firestore batch commits (rate-limit guard)
+TOTAL_EMERGENCIES = 50  # Total documents to generate and push
+FIRESTORE_BATCH_SIZE = 10  # Firestore recommends ≤500 writes/batch; 10 keeps us safe
+INTER_BATCH_SLEEP_SEC = 1.5  # Pause between Firestore batch commits (rate-limit guard)
 GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
 
 # ---------------------------------------------------------------------------
@@ -82,8 +83,12 @@ EMERGENCY_SCHEMA = types.Schema(
             type=types.Type.OBJECT,
             required=["lat", "lng"],
             properties={
-                "lat": types.Schema(type=types.Type.NUMBER, description="Latitude (India-region)"),
-                "lng": types.Schema(type=types.Type.NUMBER, description="Longitude (India-region)"),
+                "lat": types.Schema(
+                    type=types.Type.NUMBER, description="Latitude (India-region)"
+                ),
+                "lng": types.Schema(
+                    type=types.Type.NUMBER, description="Longitude (India-region)"
+                ),
             },
         ),
         "severity": types.Schema(
@@ -109,6 +114,7 @@ RESPONSE_SCHEMA = types.Schema(
 # ---------------------------------------------------------------------------
 # Step 1 — Generate emergencies via Gemini 1.5 Flash
 # ---------------------------------------------------------------------------
+
 
 def generate_emergencies() -> list[dict]:
     """
@@ -139,7 +145,11 @@ Rules:
 - Do NOT include emergency_id or status fields — those are managed externally.
 """
 
-    log.info("Calling Gemini %s for %d structured emergencies …", GEMINI_MODEL, TOTAL_EMERGENCIES)
+    log.info(
+        "Calling Gemini %s for %d structured emergencies …",
+        GEMINI_MODEL,
+        TOTAL_EMERGENCIES,
+    )
 
     response = client.models.generate_content(
         model=GEMINI_MODEL,
@@ -150,7 +160,7 @@ Rules:
             # tokens that keep the running JSON valid against the schema.
             response_mime_type="application/json",
             response_schema=RESPONSE_SCHEMA,
-            temperature=1.0,   # High temperature → more diverse scenarios
+            temperature=1.0,  # High temperature → more diverse scenarios
             max_output_tokens=8192,
         ),
     )
@@ -172,11 +182,13 @@ Rules:
     log.info("Parsed %d emergency objects from Gemini.", len(emergencies))
     return emergencies
 
+
 # ---------------------------------------------------------------------------
 # Step 2 — Enrich and sanitise each document
 # ---------------------------------------------------------------------------
 
 import random
+
 
 def enrich(raw: dict) -> dict:
     """
@@ -187,32 +199,33 @@ def enrich(raw: dict) -> dict:
       - intelligence : dynamic metadata for UI variance
     """
     severity = max(1, min(5, int(raw.get("severity", 3))))
-    
+
     return {
         # LLM-generated fields
-        "hazard_type":            str(raw.get("hazard_type", "unknown")).lower().strip(),
-        "location_coordinates":   {
+        "hazard_type": str(raw.get("hazard_type", "unknown")).lower().strip(),
+        "location_coordinates": {
             "lat": float(raw["location_coordinates"]["lat"]),
             "lng": float(raw["location_coordinates"]["lng"]),
         },
-        "severity":               severity,
-        "description":            str(raw.get("description", "")).strip(),
-
+        "severity": severity,
+        "description": str(raw.get("description", "")).strip(),
         # Injected fields — LLM never touches these
-        "emergency_id":           str(uuid.uuid4()),
-        "status":                 "triaged",
-        "urgency":                "P1" if severity >= 4 else "P2",
-        "timestamp":              firestore.SERVER_TIMESTAMP,
+        "emergency_id": str(uuid.uuid4()),
+        "status": "triaged",
+        "urgency": "P1" if severity >= 4 else "P2",
+        "timestamp": firestore.SERVER_TIMESTAMP,
         "intelligence": {
             "risk_score": random.randint(75, 99),
             "situation_report": raw.get("description", ""),
-            "ndma_protocol": f"Protocol {random.choice(['Alpha', 'Beta', 'Gamma'])} engaged for {raw.get('hazard_type', 'incident')}."
-        }
+            "ndma_protocol": f"Protocol {random.choice(['Alpha', 'Beta', 'Gamma'])} engaged for {raw.get('hazard_type', 'incident')}.",
+        },
     }
+
 
 # ---------------------------------------------------------------------------
 # Step 3 — Write to Firestore with batched, rate-limited writes
 # ---------------------------------------------------------------------------
+
 
 def write_to_firestore(docs: list[dict]) -> None:
     """
@@ -262,7 +275,9 @@ def write_to_firestore(docs: list[dict]) -> None:
 
         log.info(
             "Committing batch %d/%d (%d docs) …",
-            batch_num, total_batches, len(chunk),
+            batch_num,
+            total_batches,
+            len(chunk),
         )
         batch.commit()
         written += len(chunk)
@@ -273,11 +288,15 @@ def write_to_firestore(docs: list[dict]) -> None:
             log.debug("  Sleeping %.1f s before next batch …", INTER_BATCH_SLEEP_SEC)
             time.sleep(INTER_BATCH_SLEEP_SEC)
 
-    log.info("All %d documents successfully written to Firestore /emergencies.", written)
+    log.info(
+        "All %d documents successfully written to Firestore /emergencies.", written
+    )
+
 
 # ---------------------------------------------------------------------------
 # Entrypoint
 # ---------------------------------------------------------------------------
+
 
 def main():
     start = time.perf_counter()
@@ -292,7 +311,8 @@ def main():
         log.warning(
             "Gemini returned %d items (expected %d). "
             "Consider increasing max_output_tokens or reducing TOTAL_EMERGENCIES.",
-            len(raw_emergencies), TOTAL_EMERGENCIES,
+            len(raw_emergencies),
+            TOTAL_EMERGENCIES,
         )
 
     # 2. Enrich / sanitise each document (inject UUID, status, timestamp)

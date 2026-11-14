@@ -1,22 +1,27 @@
-import feedparser
-import time
 import json
 import os
+import time
+
+import feedparser
 from firebase_admin import firestore
 from vertexai.generative_models import GenerativeModel
+
 from backend.orchestrator.auth import SentinelAuth
+
 
 class IngestionService:
     def __init__(self):
         if not os.getenv("GEMINI_API_KEY"):
-            raise EnvironmentError("GEMINI_API_KEY is not set. Ingestion Service requires this for Triage AI.")
-            
+            raise OSError(
+                "GEMINI_API_KEY is not set. Ingestion Service requires this for Triage AI."
+            )
+
         self.db = SentinelAuth.get_firestore()
         SentinelAuth.init_vertex()
         self.model = GenerativeModel("gemini-2.5-flash-lite")
         self.feeds = [
-            "https://www.ndma.gov.in/rss", # Mock/Placeholder
-            "https://gdacs.org/xml/rss.xml" # Global Disaster Alert and Coordination System
+            "https://www.ndma.gov.in/rss",  # Mock/Placeholder
+            "https://gdacs.org/xml/rss.xml",  # Global Disaster Alert and Coordination System
         ]
 
     def poll_feeds(self):
@@ -28,17 +33,22 @@ class IngestionService:
                     for entry in feed.entries:
                         if not self._is_new(entry.link):
                             continue
-                        
+
                         print(f"[Ingestion] New alert found: {entry.title}")
                         self.process_entry(entry)
                 except Exception as e:
                     print(f"[Ingestion] Error polling {url}: {e}")
-            
-            time.sleep(300) # Poll every 5 mins
+
+            time.sleep(300)  # Poll every 5 mins
 
     def _is_new(self, link):
         # Check Firestore to see if this alert link was already processed
-        docs = self.db.collection('emergencies').where('source_link', '==', link).limit(1).get()
+        docs = (
+            self.db.collection("emergencies")
+            .where("source_link", "==", link)
+            .limit(1)
+            .get()
+        )
         return len(docs) == 0
 
     def process_entry(self, entry):
@@ -57,23 +67,26 @@ class IngestionService:
         
         Return ONLY valid JSON.
         """
-        
+
         try:
             response = self.model.generate_content(prompt)
             result = response.text.strip()
             if "```json" in result:
                 result = result.split("```json")[1].split("```")[0].strip()
-            
+
             data = json.loads(result)
-            data['status'] = 'triaged' # Direct to triaged for Orchestrator to Pick up
-            data['source_link'] = entry.link
-            data['timestamp'] = firestore.SERVER_TIMESTAMP
-            
-            self.db.collection('emergencies').add(data)
-            print(f"[Ingestion] Triaged and added: {data['hazard_type']} at {data['location'].get('address')}")
-            
+            data["status"] = "triaged"  # Direct to triaged for Orchestrator to Pick up
+            data["source_link"] = entry.link
+            data["timestamp"] = firestore.SERVER_TIMESTAMP
+
+            self.db.collection("emergencies").add(data)
+            print(
+                f"[Ingestion] Triaged and added: {data['hazard_type']} at {data['location'].get('address')}"
+            )
+
         except Exception as e:
             print(f"[Ingestion] Error processing entry: {e}")
+
 
 if __name__ == "__main__":
     service = IngestionService()

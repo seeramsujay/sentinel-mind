@@ -1,7 +1,7 @@
-import os
 import time
-from datetime import datetime
+
 from firebase_admin import firestore
+
 from .auth import SentinelAuth
 
 
@@ -9,16 +9,18 @@ class GovernanceAudit:
     @staticmethod
     def log_audit(emergency_id: str, audit_text: str, db=None):
         if not emergency_id or not audit_text:
-            print(f"[GovernanceAudit] Skipped — missing emergency_id or audit_text.")
+            print("[GovernanceAudit] Skipped — missing emergency_id or audit_text.")
             return
         if db is None:
             db = SentinelAuth.get_firestore()
         doc_ref = db.collection("emergencies").document(emergency_id)
         try:
-            doc_ref.update({
-                "intelligence.fairness_audit": audit_text,
-                "intelligence.audited_at": time.time()
-            })
+            doc_ref.update(
+                {
+                    "intelligence.fairness_audit": audit_text,
+                    "intelligence.audited_at": time.time(),
+                }
+            )
             print(f"[GovernanceAudit] Audit logged for {emergency_id}")
         except Exception as e:
             print(f"[GovernanceAudit] Failed to log audit: {e}")
@@ -28,13 +30,15 @@ class GovernanceAudit:
         """Logs a mandatory human-in-the-loop safety override."""
         if db is None:
             db = SentinelAuth.get_firestore()
-        doc_ref = db.collection('emergencies').document(emergency_id)
+        doc_ref = db.collection("emergencies").document(emergency_id)
         try:
-            doc_ref.update({
-                "intelligence.hitl_flag": True,
-                "intelligence.hitl_reason": reasoning,
-                "intelligence.flagged_at": firestore.SERVER_TIMESTAMP
-            })
+            doc_ref.update(
+                {
+                    "intelligence.hitl_flag": True,
+                    "intelligence.hitl_reason": reasoning,
+                    "intelligence.flagged_at": firestore.SERVER_TIMESTAMP,
+                }
+            )
             print(f"HITL Flagged for {emergency_id}")
         except Exception as e:
             print(f"HITL Log Error: {e}")
@@ -43,12 +47,11 @@ class GovernanceAudit:
     def approve_dispatch(emergency_id):
         """Manually approves an emergency that was flagged for HITL."""
         db = SentinelAuth.get_firestore()
-        doc_ref = db.collection('emergencies').document(emergency_id)
+        doc_ref = db.collection("emergencies").document(emergency_id)
         try:
-            doc_ref.update({
-                "status": "dispatched",
-                "intelligence.hitl_approved_at": time.time()
-            })
+            doc_ref.update(
+                {"status": "dispatched", "intelligence.hitl_approved_at": time.time()}
+            )
             print(f"[GovernanceAudit] HITL override approved for {emergency_id}")
             return True
         except Exception as e:
@@ -64,6 +67,7 @@ def hitl_daemon(poll_interval: int = 10):
     def load_flagged():
         try:
             import json
+
             with open(flagged_log) as f:
                 return set(json.load(f))
         except (FileNotFoundError, ImportError):
@@ -71,6 +75,7 @@ def hitl_daemon(poll_interval: int = 10):
 
     def save_flagged(ids):
         import json
+
         try:
             with open(flagged_log, "w") as f:
                 json.dump(list(ids), f)
@@ -92,7 +97,13 @@ def hitl_daemon(poll_interval: int = 10):
                 if doc.id in flagged:
                     continue
 
-                reason = doc_dict.get("intelligence", {}).get("hitl_reason", "No reason provided") if isinstance(doc_dict.get("intelligence"), dict) else "No reason provided"
+                reason = (
+                    doc_dict.get("intelligence", {}).get(
+                        "hitl_reason", "No reason provided"
+                    )
+                    if isinstance(doc_dict.get("intelligence"), dict)
+                    else "No reason provided"
+                )
                 print(f"[HITL Daemon] FLAGGED {doc.id}: {reason}")
                 flagged.add(doc.id)
             save_flagged(flagged)

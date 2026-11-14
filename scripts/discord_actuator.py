@@ -23,15 +23,15 @@ Prerequisites:
     service-account.json present in project root.
 """
 
+import logging
 import os
 import sys
-import time
-import logging
 import threading
+import time
 
+import firebase_admin
 import requests
 from dotenv import load_dotenv
-import firebase_admin
 from firebase_admin import credentials, firestore
 
 # ---------------------------------------------------------------------------
@@ -51,15 +51,18 @@ log = logging.getLogger("discord_actuator")
 # Config — read from .env
 # ---------------------------------------------------------------------------
 
-SERVICE_ACCOUNT_PATH    = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "service-account.json")
-WEBHOOK_GENERAL         = os.getenv("DISCORD_WEBHOOK_URL", "")           # severity 1-3
-WEBHOOK_HIGH_PRIORITY   = os.getenv("DISCORD_ALERT_WEBHOOK_URL", "")     # severity 4-5
-POLL_INTERVAL_SEC       = 10   # Fallback polling interval if on_snapshot fails
-REQUEST_TIMEOUT_SEC     = 10   # Max wait for Discord HTTP response
+SERVICE_ACCOUNT_PATH = os.getenv(
+    "GOOGLE_APPLICATION_CREDENTIALS", "service-account.json"
+)
+WEBHOOK_GENERAL = os.getenv("DISCORD_WEBHOOK_URL", "")  # severity 1-3
+WEBHOOK_HIGH_PRIORITY = os.getenv("DISCORD_ALERT_WEBHOOK_URL", "")  # severity 4-5
+POLL_INTERVAL_SEC = 10  # Fallback polling interval if on_snapshot fails
+REQUEST_TIMEOUT_SEC = 10  # Max wait for Discord HTTP response
 
 # ---------------------------------------------------------------------------
 # Firebase initialisation
 # ---------------------------------------------------------------------------
+
 
 def init_firestore() -> firestore.Client:
     """
@@ -84,9 +87,11 @@ def init_firestore() -> firestore.Client:
 
     return firestore.client()
 
+
 # ---------------------------------------------------------------------------
 # Severity routing
 # ---------------------------------------------------------------------------
+
 
 def resolve_webhook(severity: int) -> str:
     """
@@ -104,16 +109,21 @@ def resolve_webhook(severity: int) -> str:
     if severity >= 4:
         url = WEBHOOK_HIGH_PRIORITY
         if not url:
-            log.warning("severity=%d but DISCORD_ALERT_WEBHOOK_URL is not set — falling back to general.", severity)
+            log.warning(
+                "severity=%d but DISCORD_ALERT_WEBHOOK_URL is not set — falling back to general.",
+                severity,
+            )
             url = WEBHOOK_GENERAL
     else:
         url = WEBHOOK_GENERAL
 
     return url
 
+
 # ---------------------------------------------------------------------------
 # Discord message builder
 # ---------------------------------------------------------------------------
+
 
 def build_discord_payload(doc: dict) -> dict:
     """
@@ -121,7 +131,7 @@ def build_discord_payload(doc: dict) -> dict:
     The message body is hardcoded per spec; only severity and hazard_type
     are interpolated from the Firestore document.
     """
-    severity    = int(doc.get("severity", 0))
+    severity = int(doc.get("severity", 0))
     hazard_type = str(doc.get("hazard_type", "unknown")).strip()
 
     # Exact message format mandated by the spec
@@ -133,9 +143,11 @@ def build_discord_payload(doc: dict) -> dict:
 
     return {"content": content}
 
+
 # ---------------------------------------------------------------------------
 # Discord sender
 # ---------------------------------------------------------------------------
+
 
 def send_discord_alert(payload: dict, webhook_url: str, doc_id: str) -> bool:
     """
@@ -158,11 +170,18 @@ def send_discord_alert(payload: dict, webhook_url: str, doc_id: str) -> bool:
             log.info("[%s] ✓ Discord alert sent (HTTP %d).", doc_id, resp.status_code)
             return True
         else:
-            log.warning("[%s] Discord returned HTTP %d: %s", doc_id, resp.status_code, resp.text[:200])
+            log.warning(
+                "[%s] Discord returned HTTP %d: %s",
+                doc_id,
+                resp.status_code,
+                resp.text[:200],
+            )
             return False
 
     except requests.exceptions.Timeout:
-        log.error("[%s] Discord request timed out after %ds.", doc_id, REQUEST_TIMEOUT_SEC)
+        log.error(
+            "[%s] Discord request timed out after %ds.", doc_id, REQUEST_TIMEOUT_SEC
+        )
         return False
     except requests.exceptions.ConnectionError as exc:
         log.error("[%s] Discord connection error: %s", doc_id, exc)
@@ -171,9 +190,11 @@ def send_discord_alert(payload: dict, webhook_url: str, doc_id: str) -> bool:
         log.error("[%s] Unexpected error sending Discord alert: %s", doc_id, exc)
         return False
 
+
 # ---------------------------------------------------------------------------
 # State write-back (the idempotency lock)
 # ---------------------------------------------------------------------------
+
 
 def mark_discord_sent(db: firestore.Client, doc_id: str) -> None:
     """
@@ -190,19 +211,24 @@ def mark_discord_sent(db: firestore.Client, doc_id: str) -> None:
     accidentally clobber other fields written by other agents in the swarm.
     """
     try:
-        db.collection("emergencies").document(doc_id).update({
-            "discord_sent": True,
-        })
+        db.collection("emergencies").document(doc_id).update(
+            {
+                "discord_sent": True,
+            }
+        )
         log.info("[%s] ✓ Firestore: discord_sent=True written.", doc_id)
     except Exception as exc:
         log.error(
             "[%s] FAILED to write discord_sent=True — alert may duplicate on next cycle: %s",
-            doc_id, exc,
+            doc_id,
+            exc,
         )
+
 
 # ---------------------------------------------------------------------------
 # Core processing logic (shared by both on_snapshot and polling paths)
 # ---------------------------------------------------------------------------
+
 
 def process_doc(db: firestore.Client, doc_id: str, doc: dict) -> None:
     """
@@ -224,16 +250,18 @@ def process_doc(db: firestore.Client, doc_id: str, doc: dict) -> None:
         return  # Already sent; skip silently
 
     severity = int(doc.get("severity", 0))
-    hazard   = doc.get("hazard_type", "unknown")
+    hazard = doc.get("hazard_type", "unknown")
     log.info(
         "[%s] Triggered → status=dispatched, severity=%d, hazard=%s",
-        doc_id, severity, hazard,
+        doc_id,
+        severity,
+        hazard,
     )
 
     # Build message and resolve routing
-    payload     = build_discord_payload(doc)
+    payload = build_discord_payload(doc)
     webhook_url = resolve_webhook(severity)
-    channel     = "HIGH-PRIORITY" if severity >= 4 else "general"
+    channel = "HIGH-PRIORITY" if severity >= 4 else "general"
     log.info("[%s] Routing to %s channel.", doc_id, channel)
 
     # Send alert
@@ -245,9 +273,11 @@ def process_doc(db: firestore.Client, doc_id: str, doc: dict) -> None:
     if success:
         mark_discord_sent(db, doc_id)
 
+
 # ---------------------------------------------------------------------------
 # Path A — Real-time on_snapshot listener (preferred)
 # ---------------------------------------------------------------------------
+
 
 def start_snapshot_listener(db: firestore.Client) -> threading.Event:
     """
@@ -273,8 +303,8 @@ def start_snapshot_listener(db: firestore.Client) -> threading.Event:
             # REMOVED documents are irrelevant; skip them
             if change.type.name == "REMOVED":
                 continue
-            doc_id  = change.document.id
-            doc     = change.document.to_dict() or {}
+            doc_id = change.document.id
+            doc = change.document.to_dict() or {}
             process_doc(db, doc_id, doc)
 
     col_ref = db.collection("emergencies")
@@ -286,9 +316,11 @@ def start_snapshot_listener(db: firestore.Client) -> threading.Event:
     log.info("on_snapshot listener registered on /emergencies.")
     return ready
 
+
 # ---------------------------------------------------------------------------
 # Path B — Robust polling loop (fallback)
 # ---------------------------------------------------------------------------
+
 
 def polling_loop(db: firestore.Client) -> None:
     """
@@ -317,9 +349,11 @@ def polling_loop(db: firestore.Client) -> None:
 
         time.sleep(POLL_INTERVAL_SEC)
 
+
 # ---------------------------------------------------------------------------
 # Entrypoint
 # ---------------------------------------------------------------------------
+
 
 def main():
     log.info("=== SentinelMind Discord Actuator Daemon ===")
@@ -332,9 +366,13 @@ def main():
         )
         sys.exit(1)
     if not WEBHOOK_GENERAL:
-        log.warning("DISCORD_WEBHOOK_URL not set — severity 1-3 alerts will be suppressed.")
+        log.warning(
+            "DISCORD_WEBHOOK_URL not set — severity 1-3 alerts will be suppressed."
+        )
     if not WEBHOOK_HIGH_PRIORITY:
-        log.warning("DISCORD_ALERT_WEBHOOK_URL not set — severity 4-5 alerts will fall back to general channel.")
+        log.warning(
+            "DISCORD_ALERT_WEBHOOK_URL not set — severity 4-5 alerts will fall back to general channel."
+        )
 
     db = init_firestore()
 
@@ -347,10 +385,14 @@ def main():
 
         # Wait up to 15 s for the first snapshot to confirm the stream is live.
         if not ready_event.wait(timeout=15):
-            log.warning("on_snapshot did not receive initial snapshot within 15s — falling back to polling.")
-            polling_loop(db)   # Blocking fallback
+            log.warning(
+                "on_snapshot did not receive initial snapshot within 15s — falling back to polling."
+            )
+            polling_loop(db)  # Blocking fallback
         else:
-            log.info("Real-time listener is live. Daemon running — press Ctrl+C to stop.")
+            log.info(
+                "Real-time listener is live. Daemon running — press Ctrl+C to stop."
+            )
             # Keep main thread alive; on_snapshot callbacks fire in background threads.
             while True:
                 time.sleep(60)

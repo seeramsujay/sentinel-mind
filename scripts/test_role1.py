@@ -1,13 +1,11 @@
-import pytest
-import json
 import os
 import sys
-import tempfile
-import math
+
+import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
-from backend.orchestrator import spatial_logic, audit, resolver
+from backend.orchestrator import audit, resolver, spatial_logic
 
 
 class MockDoc:
@@ -38,7 +36,12 @@ class TestSpatialLogic:
         assert spatial_logic.haversine_distance({}, {}) is None
 
     def test_detect_duplicates_exact_match(self):
-        existing = [MockDoc({"hazard_type": "flood", "location": {"lat": 17.433, "lng": 78.444}}, "dup-1")]
+        existing = [
+            MockDoc(
+                {"hazard_type": "flood", "location": {"lat": 17.433, "lng": 78.444}},
+                "dup-1",
+            )
+        ]
         result = spatial_logic.detect_duplicates(
             {"hazard_type": "flood", "location": {"lat": 17.433, "lng": 78.444}},
             existing,
@@ -47,7 +50,12 @@ class TestSpatialLogic:
         assert result == "dup-1"
 
     def test_detect_duplicates_within_threshold(self):
-        existing = [MockDoc({"hazard_type": "flood", "location": {"lat": 17.433, "lng": 78.444}}, "dup-2")]
+        existing = [
+            MockDoc(
+                {"hazard_type": "flood", "location": {"lat": 17.433, "lng": 78.444}},
+                "dup-2",
+            )
+        ]
         result = spatial_logic.detect_duplicates(
             {"hazard_type": "flood", "location": {"lat": 17.4331, "lng": 78.4441}},
             existing,
@@ -56,7 +64,12 @@ class TestSpatialLogic:
         assert result == "dup-2"
 
     def test_detect_duplicates_outside_threshold(self):
-        existing = [MockDoc({"hazard_type": "flood", "location": {"lat": 17.433, "lng": 78.444}}, "dup-3")]
+        existing = [
+            MockDoc(
+                {"hazard_type": "flood", "location": {"lat": 17.433, "lng": 78.444}},
+                "dup-3",
+            )
+        ]
         result = spatial_logic.detect_duplicates(
             {"hazard_type": "flood", "location": {"lat": 18.0, "lng": 79.0}},
             existing,
@@ -65,7 +78,15 @@ class TestSpatialLogic:
         assert result is None
 
     def test_detect_duplicates_different_hazard_type(self):
-        existing = [MockDoc({"hazard_type": "earthquake", "location": {"lat": 17.433, "lng": 78.444}}, "dup-4")]
+        existing = [
+            MockDoc(
+                {
+                    "hazard_type": "earthquake",
+                    "location": {"lat": 17.433, "lng": 78.444},
+                },
+                "dup-4",
+            )
+        ]
         result = spatial_logic.detect_duplicates(
             {"hazard_type": "flood", "location": {"lat": 17.433, "lng": 78.444}},
             existing,
@@ -89,7 +110,12 @@ class TestSpatialLogic:
         assert result is None
 
     def test_detect_duplicates_flat_coords(self):
-        existing = [MockDoc({"hazard_type": "fire", "latitude": 17.433, "longitude": 78.444}, "dup-5")]
+        existing = [
+            MockDoc(
+                {"hazard_type": "fire", "latitude": 17.433, "longitude": 78.444},
+                "dup-5",
+            )
+        ]
         result = spatial_logic.detect_duplicates(
             {"hazard_type": "fire", "latitude": 17.433, "longitude": 78.444},
             existing,
@@ -98,7 +124,12 @@ class TestSpatialLogic:
         assert result == "dup-5"
 
     def test_detect_duplicates_mixed_coords(self):
-        existing = [MockDoc({"hazard_type": "fire", "location": {"lat": 17.433, "lng": 78.444}}, "dup-6")]
+        existing = [
+            MockDoc(
+                {"hazard_type": "fire", "location": {"lat": 17.433, "lng": 78.444}},
+                "dup-6",
+            )
+        ]
         result = spatial_logic.detect_duplicates(
             {"hazard_type": "fire", "latitude": 17.433, "longitude": 78.444},
             existing,
@@ -110,10 +141,14 @@ class TestSpatialLogic:
 class TestAuditLogAudit:
     def test_log_audit_empty_id(self, monkeypatch, tmp_path):
         called = False
+
         def fake_update(data):
             nonlocal called
             called = True
-        monkeypatch.setattr(audit.GovernanceAudit, "log_audit", lambda eid, text, db=None: None)
+
+        monkeypatch.setattr(
+            audit.GovernanceAudit, "log_audit", lambda eid, text, db=None: None
+        )
         audit.GovernanceAudit.log_audit("", "some text")
         audit.GovernanceAudit.log_audit(None, "some text")
 
@@ -177,7 +212,7 @@ class TestConflictResolver:
     def test_parse_mixed_fences(self):
         r = resolver.ConflictResolver()
         r._init_vertex = lambda: None
-        text = 'Here is some text before ``` the JSON ``` more text after'
+        text = "Here is some text before ``` the JSON ``` more text after"
         result = r._parse(text)
         assert result is None
 
@@ -201,7 +236,15 @@ class TestEmergencyDocSchema:
         assert d.get("urgency") is None
 
     def test_status_enum_valid(self):
-        valid = {"received", "triaged", "awaiting_dispatch", "dispatched", "conflict", "recovery", "awaiting_human_approval"}
+        valid = {
+            "received",
+            "triaged",
+            "awaiting_dispatch",
+            "dispatched",
+            "conflict",
+            "recovery",
+            "awaiting_human_approval",
+        }
         for s in valid:
             assert s in valid
 

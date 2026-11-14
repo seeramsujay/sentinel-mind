@@ -5,11 +5,30 @@ def haversine_distance(coord1: dict, coord2: dict) -> float | None:
     if not isinstance(coord1, dict) or not isinstance(coord2, dict):
         return None
     try:
-        lat1 = coord1.get("lat") if coord1.get("lat") is not None else coord1.get("latitude")
-        lon1 = coord1.get("lng") if coord1.get("lng") is not None else coord1.get("longitude")
-        lat2 = coord2.get("lat") if coord2.get("lat") is not None else coord2.get("latitude")
-        lon2 = coord2.get("lng") if coord2.get("lng") is not None else coord2.get("longitude")
-        lat1 = float(lat1); lon1 = float(lon1); lat2 = float(lat2); lon2 = float(lon2)
+        lat1 = (
+            coord1.get("lat")
+            if coord1.get("lat") is not None
+            else coord1.get("latitude")
+        )
+        lon1 = (
+            coord1.get("lng")
+            if coord1.get("lng") is not None
+            else coord1.get("longitude")
+        )
+        lat2 = (
+            coord2.get("lat")
+            if coord2.get("lat") is not None
+            else coord2.get("latitude")
+        )
+        lon2 = (
+            coord2.get("lng")
+            if coord2.get("lng") is not None
+            else coord2.get("longitude")
+        )
+        lat1 = float(lat1)
+        lon1 = float(lon1)
+        lat2 = float(lat2)
+        lon2 = float(lon2)
     except (TypeError, ValueError):
         return None
 
@@ -17,11 +36,16 @@ def haversine_distance(coord1: dict, coord2: dict) -> float | None:
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
     dphi = math.radians(lat2 - lat1)
     dlambda = math.radians(lon2 - lon1)
-    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+    a = (
+        math.sin(dphi / 2) ** 2
+        + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+    )
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
-def detect_duplicates(new_event: dict, existing_events, threshold_meters: float = 500) -> str | None:
+def detect_duplicates(
+    new_event: dict, existing_events, threshold_meters: float = 500
+) -> str | None:
     new_loc = new_event.get("location") or {}
     if not isinstance(new_loc, dict):
         new_loc = {}
@@ -40,7 +64,9 @@ def detect_duplicates(new_event: dict, existing_events, threshold_meters: float 
         if not hasattr(existing, "id"):
             existing_dict = existing
         else:
-            existing_dict = existing if isinstance(existing, dict) else existing.to_dict()
+            existing_dict = (
+                existing if isinstance(existing, dict) else existing.to_dict()
+            )
 
         if isinstance(existing, dict):
             existing_data = existing
@@ -54,8 +80,16 @@ def detect_duplicates(new_event: dict, existing_events, threshold_meters: float 
             continue
 
         existing_loc = existing_data.get("location") or {}
-        ex_lat = existing_loc.get("lat") if isinstance(existing_loc, dict) else existing_data.get("latitude")
-        ex_lng = existing_loc.get("lng") if isinstance(existing_loc, dict) else existing_data.get("longitude")
+        ex_lat = (
+            existing_loc.get("lat")
+            if isinstance(existing_loc, dict)
+            else existing_data.get("latitude")
+        )
+        ex_lng = (
+            existing_loc.get("lng")
+            if isinstance(existing_loc, dict)
+            else existing_data.get("longitude")
+        )
         if ex_lat is None or ex_lng is None:
             continue
 
