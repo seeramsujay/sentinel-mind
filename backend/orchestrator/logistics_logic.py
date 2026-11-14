@@ -167,20 +167,20 @@ class RiskAssessor:
         prompt = f"""
         System: SentinelMind Crisis Prediction Engine (Role 3)
         Task: Analyze hazard context and provide a 6-hour risk assessment score.
-        
+
         Emergency Details:
         - Type: {emergency_data.get('hazard_type')}
         - Urgency: {emergency_data.get('urgency')}
         - Location: {emergency_data.get('location', {}).get('address', 'Unknown')}
-        
+
         Weather Context:
         {json.dumps(weather_data, indent=2)}
-        
+
         Output Requirements:
         1. Risk Score (0-100)
         2. Threat Analysis (Brief)
         3. 6-Hour Forecast Trend (Improving/Worsening)
-        
+
         Return JSON format:
         {{
             "risk_score": 85,

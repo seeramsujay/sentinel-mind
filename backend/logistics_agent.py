@@ -201,14 +201,14 @@ class LogisticsAgent:
         prompt = f"""
         System: SentinelMind Crisis Prediction Engine (Role 3)
         Task: Draft a professional SitRep.
-        
+
         Incident: {data.get('hazard_type')} at {data.get('location', {}).get('address')}
         Risk: {risk_data.get('risk_score')} ({risk_data.get('assessment')})
         ETA: {route_details.get('eta')}
-        
+
         Mandatory Protocol (RAG Context):
         {rag_context}
-        
+
         Requirement: Integrate the mandatory protocol into the tactical advice. Use gemini-2.5-flash-lite.
         """
         try:

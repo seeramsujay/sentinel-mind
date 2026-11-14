@@ -55,16 +55,16 @@ class IngestionService:
         prompt = f"""
         System: SentinelMind Triage AI
         Task: Convert unstructured disaster alert into a structured JSON emergency report.
-        
+
         Alert Title: {entry.title}
         Alert Description: {entry.description}
-        
+
         Output Requirements (JSON):
         1. hazard_type (Flood, Earthquake, Fire, Cyclone, etc.)
         2. urgency (P1, P2, P3) - P1 is life-threatening, P3 is low risk.
         3. location (JSON object with 'address', 'lat', 'lng') - Estimate if not explicit.
         4. description (Brief summary)
-        
+
         Return ONLY valid JSON.
         """
 

@@ -14,7 +14,7 @@ class ConflictResolver:
         )
         self._system_prompt = """You are the SentinelMind Meta-Orchestrator.
 You must respond ONLY with valid JSON — no markdown, no explanation.
-Goal: 
+Goal:
 1. Prioritize based on life-threat potential and urgency (P1/P2/P3).
 2. Optimize distance/ETA.
 3. Maintain ethical fairness (documented in fairness_audit).

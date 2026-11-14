@@ -34,10 +34,10 @@ class ConflictDaemon:
         prompt = f"""
         You are an AI Conflict Resolution Commander.
         Multiple disasters have been assigned the same response unit: {unit_id}.
-        
+
         Disasters competing for this unit:
         {json.dumps(payload, indent=2, cls=SentinelEncoder)}
-        
+
         Analyze the urgency, hazard_type, and assess prioritizing the most critical one.
         Return ONLY the string ID of the emergency that should KEEP the resource. No other text.
         """
