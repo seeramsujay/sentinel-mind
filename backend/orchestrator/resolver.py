@@ -1,16 +1,20 @@
 import json
 import os
+
 from vertexai.generative_models import GenerativeModel
+
 from .auth import SentinelAuth, SentinelEncoder
 
 
 class ConflictResolver:
     def __init__(self):
         SentinelAuth.init_vertex()
-        self.model = GenerativeModel(os.getenv("VERTEX_MODEL_ID", "gemini-2.5-flash-lite"))
+        self.model = GenerativeModel(
+            os.getenv("VERTEX_MODEL_ID", "gemini-2.5-flash-lite")
+        )
         self._system_prompt = """You are the SentinelMind Meta-Orchestrator.
 You must respond ONLY with valid JSON — no markdown, no explanation.
-Goal: 
+Goal:
 1. Prioritize based on life-threat potential and urgency (P1/P2/P3).
 2. Optimize distance/ETA.
 3. Maintain ethical fairness (documented in fairness_audit).
@@ -36,18 +40,18 @@ Return JSON format:
 Rules: Prioritize P1 over P2 over P3. Assign nearest available unit.
 If no unit is available for a P1, set action to "wait"."""
 
-
     def resolve(self, conflicts, resources) -> dict | None:
         if not conflicts or not resources:
-            print(f"[ConflictResolver] Skipped — no conflicts or no resources.")
+            print("[ConflictResolver] Skipped — no conflicts or no resources.")
             return None
 
         payload = {
             "conflicts": conflicts,
             "resources": [
                 {k: v for k, v in r.items() if v is not None}
-                for r in resources if isinstance(r, dict)
-            ]
+                for r in resources
+                if isinstance(r, dict)
+            ],
         }
 
         user_prompt = f"Conflicting emergencies:\n{json.dumps(payload['conflicts'], indent=2, cls=SentinelEncoder)}\n\nAvailable resources:\n{json.dumps(payload['resources'], indent=2, cls=SentinelEncoder)}"

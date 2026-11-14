@@ -3,12 +3,12 @@ Orchestrator Daemon
 Monitors /emergencies for triaged entries (duplicate check) and conflict entries (AI resolution).
 """
 
-import os
 import time
-from .auth import SentinelAuth
-from .spatial_logic import detect_duplicates
-from .resolver import ConflictResolver
+
 from .audit import GovernanceAudit
+from .auth import SentinelAuth
+from .resolver import ConflictResolver
+from .spatial_logic import detect_duplicates
 
 RESOLVED_LOG = "/tmp/sentinelmind_resolved.json"
 
@@ -16,6 +16,7 @@ RESOLVED_LOG = "/tmp/sentinelmind_resolved.json"
 def _load_resolved() -> set:
     try:
         import json
+
         with open(RESOLVED_LOG) as f:
             return set(json.load(f))
     except (FileNotFoundError, ImportError):
@@ -24,6 +25,7 @@ def _load_resolved() -> set:
 
 def _save_resolved(resolved: set):
     import json
+
     try:
         with open(RESOLVED_LOG, "w") as f:
             json.dump(list(resolved), f)
@@ -65,18 +67,22 @@ class OrchestratorDaemon:
 
     def _handle_triaged(self, doc, data: dict, db):
         doc_id = doc.id
-        existing = db.collection("emergencies").where(
-            "status", "in", ["triaged", "awaiting_dispatch", "dispatched"]
-        ).get()
+        existing = (
+            db.collection("emergencies")
+            .where("status", "in", ["triaged", "awaiting_dispatch", "dispatched"])
+            .get()
+        )
         existing = [d for d in existing if d.id != doc_id]
         dup_id = detect_duplicates(data, existing)
         if dup_id:
             print(f"[Orchestrator] MERGED {doc_id} → {dup_id}")
-            doc.reference.update({
-                "status": "merged",
-                "merged_into": dup_id,
-                "intelligence.meta_note": f"Merged into {dup_id} via Proxy User Logic."
-            })
+            doc.reference.update(
+                {
+                    "status": "merged",
+                    "merged_into": dup_id,
+                    "intelligence.meta_note": f"Merged into {dup_id} via Proxy User Logic.",
+                }
+            )
         else:
             print(f"[Orchestrator] PROMOTED {doc_id} → awaiting_dispatch")
             doc.reference.update({"status": "awaiting_dispatch"})
@@ -86,8 +92,8 @@ class OrchestratorDaemon:
         print(f"[Orchestrator] RESOLVING CONFLICT: {doc_id}")
 
         resources = [
-            r.to_dict() for r in db.collection("resources")
-            .where("status", "==", "available").get()
+            r.to_dict()
+            for r in db.collection("resources").where("status", "==", "available").get()
         ]
         conflicts = [data]
         decision = resolver.resolve(conflicts, resources)
@@ -98,20 +104,32 @@ class OrchestratorDaemon:
         for d in decision["decisions"]:
             if d.get("emergency_id") != doc_id:
                 continue
-            
+
             # HITL Override Logic
             is_hitl = d.get("hitl_mandatory", False)
-            final_status = "awaiting_human_approval" if is_hitl else ("dispatched" if d.get("action") == "dispatch" else "awaiting_human_approval")
-            
-            doc.reference.update({
-                "status": final_status,
-                "resource_assignment.unit_id": d.get("resource_id"),
-                "intelligence.bias_score": d.get("bias_score", 0),
-                "intelligence.fairness_audit": d.get("fairness_audit", "")
-            })
-            
+            final_status = (
+                "awaiting_human_approval"
+                if is_hitl
+                else (
+                    "dispatched"
+                    if d.get("action") == "dispatch"
+                    else "awaiting_human_approval"
+                )
+            )
+
+            doc.reference.update(
+                {
+                    "status": final_status,
+                    "resource_assignment.unit_id": d.get("resource_id"),
+                    "intelligence.bias_score": d.get("bias_score", 0),
+                    "intelligence.fairness_audit": d.get("fairness_audit", ""),
+                }
+            )
+
             if is_hitl:
-                GovernanceAudit.log_hitl_flag(doc_id, d.get("hitl_reasoning", "Bias risk detected."), db)
+                GovernanceAudit.log_hitl_flag(
+                    doc_id, d.get("hitl_reasoning", "Bias risk detected."), db
+                )
             else:
                 print(f"[Orchestrator] RESOLVED {doc_id} → {d.get('action')}")
 

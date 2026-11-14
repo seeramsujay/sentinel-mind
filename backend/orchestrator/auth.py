@@ -2,41 +2,50 @@ class SentinelAuth:
     @staticmethod
     def get_project_id():
         import os
-        return os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCP_PROJECT") or os.getenv("GCP_PROJECT_ID")
+
+        return (
+            os.getenv("GOOGLE_CLOUD_PROJECT")
+            or os.getenv("GCP_PROJECT")
+            or os.getenv("GCP_PROJECT_ID")
+        )
 
     @staticmethod
     def get_firestore():
         import firebase_admin
         from firebase_admin import firestore
-        
+
         try:
             firebase_admin.get_app()
         except ValueError:
             firebase_admin.initialize_app()
-            
+
         return firestore.client()
-        
+
     @staticmethod
     def init_vertex():
-        import vertexai
         import os
+
+        import vertexai
+
         project = SentinelAuth.get_project_id()
         location = os.getenv("GCP_REGION", "us-central1")
         if project:
             vertexai.init(project=project, location=location)
 
+
 import json
-from datetime import datetime
+
 
 class SentinelEncoder(json.JSONEncoder):
     """Custom JSON encoder for Firestore types."""
+
     def default(self, obj):
         try:
             # Handle Firestore Timestamps and Python Datetimes
-            if hasattr(obj, 'isoformat'):
+            if hasattr(obj, "isoformat"):
                 return obj.isoformat()
             if isinstance(obj, bytes):
-                return obj.decode('utf-8', errors='ignore')
+                return obj.decode("utf-8", errors="ignore")
             return str(obj)
         except:
             return super().default(obj)

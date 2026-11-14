@@ -1,6 +1,9 @@
 import os
+
 from vertexai.generative_models import GenerativeModel
+
 from backend.orchestrator.auth import SentinelAuth
+
 
 def verify_model():
     SentinelAuth.init_vertex()
@@ -13,6 +16,7 @@ def verify_model():
         print("Model verification SUCCESS.")
     except Exception as e:
         print(f"Model verification FAILED: {e}")
+
 
 if __name__ == "__main__":
     verify_model()
