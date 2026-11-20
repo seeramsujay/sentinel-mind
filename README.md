@@ -1,4 +1,24 @@
-# Sentinel-Mind: Autonomous Multi-Agent Disaster Response
+<div align="center">
+
+<img src="assets/logo.svg" alt="Sentinel-Mind Logo" width="220" />
+
+# Sentinel-Mind
+
+### *Autonomous Multi-Agent Disaster Response & Real-Time Signal Deduplication Engine*
+
+[![Cloud Run Deployment](https://img.shields.io/badge/Deployed-Google%20Cloud%20Run-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://sentinel-mind-2kvp3xctjq-uc.a.run.app)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Gemini 2.5 Flash](https://img.shields.io/badge/AI%20Engine-Gemini%202.5%20Flash-8E75C4?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/vertex-ai)
+[![Firestore](https://img.shields.io/badge/Real--Time%20DB-Firestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![Engineering Roadmap](https://img.shields.io/badge/Engineering-Future%20Roadmap-8A2BE2?style=for-the-badge)](future.md)
+
+<p align="center">
+  <b>Resolving the critical "duplicate signal" bottleneck during large-scale emergencies through real-time clustering, multimodal drone triage, and automated dispatch.</b>
+</p>
+
+---
+
+</div>
 
 Sentinel-Mind is a high-impact, AI-driven disaster response platform designed to resolve the critical "duplicate signal" bottleneck during large-scale emergencies. By autonomously clustering redundant SOS calls and orchestrating real-time logistics, it shrinks the response window from hours to seconds.
 
@@ -65,7 +85,8 @@ The system moves documents through a strict state pipeline to ensure zero-loss d
 ## 📁 Project Map
 - `backend/`: Core FastAPI server and autonomous daemons.
 - `frontend/`: React-based tactical dashboard.
-- `Archives/`: Detailed roadmaps, tech stack documentation, and future upgrade plans.
+- `future.md`: Comprehensive engineering roadmap, off-grid LoRa mesh relays, and MILP dispatch architecture.
+- `Archives/`: Detailed roadmaps, tech stack documentation, and historical upgrade plans.
 - `schema.json`: The universal data contract shared across all agents.
 
 ---
